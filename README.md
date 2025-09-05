@@ -16,6 +16,13 @@ The Clinical TLF Automation System revolutionizes clinical trial reporting by co
 - **Automated R Code Generation** with context awareness
 - **Interactive Debugging** with real-time assistance
 
+### 🖥️ **Live UI Demo**
+
+Experience the actual user interface:
+- **[📱 Interactive Demo](docs/index.html)** - Full UI showcase with live demo
+- **[🚀 Direct UI Access](app/ui/real_ui.html)** - Open the working interface
+- **[🎨 UI Showcase](showcase_ui.html)** - Embedded UI with feature highlights
+
 ## 🔄 **Automated Workflow**
 
 ![Workflow Overview](github_assets/figures/fig2-workflow-overview.svg)
