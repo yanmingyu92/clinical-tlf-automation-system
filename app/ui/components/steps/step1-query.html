@@ -1,0 +1,78 @@
+<!-- Step 1: Query Input & Analysis Component -->
+<div id="step1-container" class="step-container">
+    <div class="step-section">
+        <h2>🔍 STEP 1: Query Input & Analysis with Real AI</h2>
+        <p><strong>Describe your clinical table requirements and get intelligent analysis using real AI components</strong></p>
+
+        <div id="component-status" class="component-status">
+            🔄 Checking real AI component status...
+        </div>
+
+        <div class="input-group">
+            <label for="query">Clinical Table Request:</label>
+            <textarea id="query" rows="5" placeholder="Example: Create demographics table by treatment group with summary statistics, p-values, and FDA-compliant formatting for regulatory submission"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="input-group">
+                <label for="domain">Clinical Domain:</label>
+                <select id="domain">
+                    <option value="auto">Auto-Detect</option>
+                    <option value="demographics">Demographics</option>
+                    <option value="adverse">Adverse Events</option>
+                    <option value="efficacy">Efficacy</option>
+                    <option value="laboratory">Laboratory</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="complexity">Query Complexity:</label>
+                <select id="complexity">
+                    <option value="auto">Auto-Detect</option>
+                    <option value="minimal">Minimal</option>
+                    <option value="basic">Basic</option>
+                    <option value="detailed">Detailed</option>
+                    <option value="comprehensive">Comprehensive</option>
+                    <option value="highly_specific">Highly Specific (FDA)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ADaM Dataset Exploration Section -->
+        <div class="input-group" style="margin-top: 20px;">
+            <label for="dataset-path">📊 ADaM Dataset Path:</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="dataset-path" placeholder="data/adam/adsl.sas7bdat"
+                       style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <input type="file" id="dataset-file-input" accept=".sas7bdat,.csv" style="display: none;" onchange="handleFileSelection()">
+                <button onclick="document.getElementById('dataset-file-input').click()"
+                        style="background: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
+                    📁 Browse
+                </button>
+                <button id="explore-dataset-btn" onclick="exploreDataset()"
+                        style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
+                    🔍 Explore Dataset
+                </button>
+            </div>
+            <small style="color: #6c757d; margin-top: 5px; display: block;">
+                💡 Dataset path will be suggested by AI analysis, or use Browse to select a file<br>
+                🔍 Click "Explore Dataset" to get variable information for better R code generation
+            </small>
+        </div>
+
+        <!-- Dataset Exploration Results -->
+        <div id="dataset-exploration" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+            <h4 style="margin: 0 0 15px 0; color: #495057;">📊 Dataset Exploration Results</h4>
+            <div id="dataset-exploration-content">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+
+        <button id="analyze-btn" class="btn" onclick="analyzeQueryReal();">🔬 Analyze Query with Real AI</button>
+
+        <div id="results" class="results">
+            <h3>🎯 Real AI Analysis Complete</h3>
+            <div id="analysis-content"></div>
+        </div>
+    </div>
+</div>

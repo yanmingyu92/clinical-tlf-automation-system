@@ -1,0 +1,332 @@
+{
+  "knowledge_graph": {
+    "database": {
+      "type": "neo4j",
+      "host": "localhost",
+      "port": 7687,
+      "username": "neo4j",
+      "password": "password"
+    },
+    "vector_database": {
+      "type": "pinecone",
+      "api_key": "your_pinecone_api_key",
+      "index_name": "fda_tlf_patterns",
+      "dimension": 384
+    },
+    "embedding_model": {
+      "name": "sentence-transformers/all-MiniLM-L6-v2",
+      "max_length": 512,
+      "device": "cpu"
+    }
+  },
+  "pattern_definitions": {
+    "vital_signs": {
+      "description": "Vital signs measurement and monitoring patterns",
+      "common_parameters": ["SYSBP", "DIABP", "PULSE", "TEMP", "RESP", "WEIGHT"],
+      "statistical_method": "MMRM",
+      "clinical_thresholds": {
+        "SYSBP": {"significant_change": 20, "unit": "mmHg"},
+        "DIABP": {"significant_change": 10, "unit": "mmHg"},
+        "PULSE": {"significant_change": 20, "unit": "bpm"}
+      },
+      "quality_checks": [
+        "outlier_detection",
+        "clinical_significance_assessment",
+        "missing_data_validation"
+      ],
+      "fda_requirements": {
+        "section": "ICH E3 Section 14.3.2",
+        "population": "Safety Population",
+        "statistical_method": "Descriptive statistics and change from baseline"
+      }
+    },
+    "laboratory": {
+      "description": "Laboratory parameter analysis patterns",
+      "common_parameters": ["HGB", "WBC", "PLT", "ALT", "AST", "ALP", "TBIL", "CREAT", "BUN", "GLUC"],
+      "statistical_method": "Descriptive + Shift Analysis",
+      "shift_categories": ["Normal->Normal", "Normal->High", "Normal->Low", "High->Normal", "Low->Normal"],
+      "quality_checks": [
+        "reference_range_validation",
+        "clinical_significance_assessment",
+        "outlier_detection"
+      ],
+      "fda_requirements": {
+        "section": "ICH E3 Section 14.3.3",
+        "population": "Safety Population",
+        "statistical_method": "Descriptive statistics and shift tables"
+      }
+    },
+    "ecg": {
+      "description": "Electrocardiogram analysis patterns",
+      "common_parameters": ["QTCF", "QTCB", "QT", "PR", "QRS", "RR", "PULSE"],
+      "statistical_method": "MMRM + Clinical Thresholds",
+      "clinical_thresholds": {
+        "QTCF": {"threshold_1": 450, "threshold_2": 480, "unit": "msec"},
+        "QTCF_INC": {"significant_increase": 30, "unit": "msec"}
+      },
+      "quality_checks": [
+        "qtc_prolongation_assessment",
+        "clinical_significance_flags",
+        "model_diagnostics"
+      ],
+      "fda_requirements": {
+        "section": "ICH E3 Section 14.3.4",
+        "population": "Safety Population",
+        "statistical_method": "Descriptive statistics and change from baseline"
+      }
+    },
+    "demographics": {
+      "description": "Demographics and disposition patterns",
+      "common_parameters": ["AGE", "SEX", "RACE", "ETHNIC", "WEIGHT", "HEIGHT", "BMI"],
+      "statistical_method": "Descriptive",
+      "quality_checks": [
+        "data_completeness_validation",
+        "demographic_balance_assessment"
+      ],
+      "fda_requirements": {
+        "section": "ICH E3 Section 14.1.2",
+        "population": "All Randomized Subjects",
+        "statistical_method": "Descriptive statistics"
+      }
+    }
+  },
+  "rag_settings": {
+    "similarity_threshold": 0.7,
+    "max_similar_templates": 5,
+    "pattern_confidence_threshold": 0.6,
+    "query_analysis": {
+      "enable_nlp": true,
+      "use_keyword_matching": true,
+      "use_semantic_similarity": true
+    },
+    "template_generation": {
+      "enable_pattern_reuse": true,
+      "enable_quality_validation": true,
+      "enable_fda_compliance_check": true
+    }
+  },
+  "code_templates": {
+    "libraries": [
+      "library(dplyr)",
+      "library(tidyr)",
+      "library(haven)",
+      "library(gt)",
+      "library(flextable)",
+      "library(officer)",
+      "library(lme4)",
+      "library(emmeans)",
+      "library(broom)",
+      "library(stringr)",
+      "library(scales)"
+    ],
+    "data_preparation_template": [
+      "# Load datasets",
+      "adsl <- read_sas('data/adam/adsl.sas7bdat')",
+      "dataset <- read_sas('data/adam/dataset.sas7bdat')",
+      "",
+      "# Define treatment groups",
+      "adsl$TRT01P <- factor(adsl$TRT01P, levels = c('Placebo', 'Treatment A', 'Treatment B'))",
+      "",
+      "# Create analysis population",
+      "analysis_pop <- adsl %>% filter(POPFL == 'Y')",
+      "",
+      "# Merge with analysis data",
+      "analysis_data <- analysis_pop %>%",
+      "  left_join(dataset, by = 'USUBJID') %>%",
+      "  filter(PARAMCD %in% c('PARAM1', 'PARAM2', 'PARAM3')) %>%",
+      "  mutate(",
+      "    # Create parameter labels",
+      "    PARAM_LABEL = case_when(",
+      "      PARAMCD == 'PARAM1' ~ 'Parameter 1 (unit)',",
+      "      PARAMCD == 'PARAM2' ~ 'Parameter 2 (unit)',",
+      "      PARAMCD == 'PARAM3' ~ 'Parameter 3 (unit)',",
+      "      TRUE ~ PARAM",
+      "    ),",
+      "    # Ensure visit is factor",
+      "    AVISIT = factor(AVISIT, levels = c('Baseline', 'Week 4', 'Week 8', 'Week 12', 'Week 24')),",
+      "    # Create change from baseline",
+      "    CHG = AVAL - BASE,",
+      "    # Ensure numeric values",
+      "    AVAL = as.numeric(AVAL),",
+      "    BASE = as.numeric(BASE),",
+      "    CHG = as.numeric(CHG)",
+      "  )"
+    ],
+    "statistical_analysis_template": [
+      "# Function to create parameter summary",
+      "create_parameter_summary <- function(data, param_codes) {",
+      "  data %>%",
+      "    filter(PARAMCD %in% param_codes) %>%",
+      "    group_by(TRT01P, PARAM_LABEL, AVISIT) %>%",
+      "    summarise(",
+      "      n_subjects = n_distinct(USUBJID),",
+      "      mean_val = mean(AVAL, na.rm = TRUE),",
+      "      sd_val = sd(AVAL, na.rm = TRUE),",
+      "      .groups = 'drop'",
+      "    ) %>%",
+      "    mutate(",
+      "      mean_sd = sprintf('%.1f ± %.2f', mean_val, sd_val)",
+      "    )",
+      "}",
+      "",
+      "# Function to fit MMRM for change from baseline",
+      "fit_parameter_mmrm <- function(data, param_code) {",
+      "  # Filter for specific parameter and post-baseline visits",
+      "  param_data <- data %>%",
+      "    filter(PARAMCD == param_code, AVISIT != 'Baseline') %>%",
+      "    filter(!is.na(CHG))",
+      "  ",
+      "  # Fit mixed model",
+      "  formula_str <- 'CHG ~ TRT01P * AVISIT + BASE'",
+      "  model <- lmer(as.formula(formula_str), data = param_data)",
+      "  ",
+      "  # Get treatment differences",
+      "  contrasts <- emmeans(model, ~ TRT01P | AVISIT) %>%",
+      "    contrast(method = 'pairwise', adjust = 'none') %>%",
+      "    as.data.frame() %>%",
+      "    filter(contrast %in% c('Treatment A - Placebo', 'Treatment B - Placebo'))",
+      "  ",
+      "  # Get p-values for treatment-by-visit interaction",
+      "  anova_result <- anova(model)",
+      "  p_value <- anova_result$`Pr(>F)`[anova_result$term == 'TRT01P:AVISIT']",
+      "  ",
+      "  return(list(",
+      "    model = model,",
+      "    contrasts = contrasts,",
+      "    p_value = p_value",
+      "  ))",
+      "}"
+    ],
+    "table_generation_template": [
+      "# Create table data with proper formatting",
+      "table_data <- parameter_summary %>%",
+      "  pivot_wider(",
+      "    names_from = TRT01P,",
+      "    values_from = mean_sd,",
+      "    names_prefix = 'trt_'",
+      "  ) %>%",
+      "  mutate(",
+      "    Placebo = trt_Placebo,",
+      "    `Treatment A` = `trt_Treatment A`,",
+      "    `Treatment B` = `trt_Treatment B`,",
+      "    `Treatment A vs Placebo` = 'TBD',",
+      "    `Treatment B vs Placebo` = 'TBD',",
+      "    `p-value` = 'TBD'",
+      "  ) %>%",
+      "  select(PARAM_LABEL, AVISIT, Placebo, `Treatment A`, `Treatment B`, ",
+      "         `Treatment A vs Placebo`, `Treatment B vs Placebo`, `p-value`)",
+      "",
+      "# Create the final table with FDA-compliant formatting",
+      "parameter_table <- gt(table_data) %>%",
+      "  tab_header(",
+      "    title = 'Table 14.3.x Parameter Summary',",
+      "    subtitle = 'Safety Population'",
+      "  ) %>%",
+      "  cols_label(",
+      "    PARAM_LABEL = 'Parameter',",
+      "    AVISIT = 'Visit',",
+      "    Placebo = 'Placebo\\n(N=XXX)\\nMean ± SD',",
+      "    `Treatment A` = 'Treatment A\\n(N=XXX)\\nMean ± SD',",
+      "    `Treatment B` = 'Treatment B\\n(N=XXX)\\nMean ± SD',",
+      "    `Treatment A vs Placebo` = 'Treatment A vs Placebo\\nLS Mean Difference\\n(95% CI)',",
+      "    `Treatment B vs Placebo` = 'Treatment B vs Placebo\\nLS Mean Difference\\n(95% CI)',",
+      "    `p-value` = 'p-value'",
+      "  ) %>%",
+      "  tab_style(",
+      "    style = cell_text(weight = 'bold'),",
+      "    locations = cells_column_labels()",
+      "  ) %>%",
+      "  tab_style(",
+      "    style = cell_text(weight = 'bold'),",
+      "    locations = cells_body(columns = 'PARAM_LABEL')",
+      "  )",
+      "",
+      "# Display the table",
+      "parameter_table"
+    ],
+    "quality_checks_template": [
+      "# Data validation checks",
+      "validation_checks <- list(",
+      "  # Missing data check",
+      "  missing_data = analysis_data %>% summarise(",
+      "    missing_param1 = sum(is.na(AVAL) & PARAMCD == 'PARAM1'),",
+      "    missing_param2 = sum(is.na(AVAL) & PARAMCD == 'PARAM2'),",
+      "    missing_param3 = sum(is.na(AVAL) & PARAMCD == 'PARAM3')",
+      "  ),",
+      "  ",
+      "  # Sample size validation",
+      "  sample_sizes = analysis_data %>%",
+      "    group_by(TRT01P, PARAMCD, AVISIT) %>%",
+      "    summarise(n = n_distinct(USUBJID), .groups = 'drop'),",
+      "  ",
+      "  # Outlier detection",
+      "  outliers = analysis_data %>%",
+      "    group_by(PARAMCD) %>%",
+      "    mutate(",
+      "      q1 = quantile(AVAL, 0.25, na.rm = TRUE),",
+      "      q3 = quantile(AVAL, 0.75, na.rm = TRUE),",
+      "      iqr = q3 - q1,",
+      "      outlier = AVAL < (q1 - 1.5 * iqr) | AVAL > (q3 + 1.5 * iqr)",
+      "    ) %>%",
+      "    filter(outlier),",
+      "  ",
+      "  # Model diagnostics",
+      "  model_diagnostics = list(",
+      "    residuals = lapply(parameter_models, function(x) residuals(x$model)),",
+      "    fitted_values = lapply(parameter_models, function(x) fitted(x$model)),",
+      "    model_summaries = lapply(parameter_models, function(x) summary(x$model))",
+      "  )",
+      ")"
+    ],
+    "export_functions_template": [
+      "# Function to export table to Word document",
+      "export_to_word <- function(table, filename) {",
+      "  # Convert gt table to flextable",
+      "  ft <- as_flextable(table)",
+      "  ",
+      "  # Create Word document",
+      "  doc <- read_docx() %>%",
+      "    body_add_flextable(ft) %>%",
+      "    body_add_par('', style = 'Normal') %>%",
+      "    body_add_par('Source: Clinical Study Report', style = 'Normal') %>%",
+      "    body_add_par(paste('Generated on:', Sys.Date()), style = 'Normal')",
+      "  ",
+      "  # Save document",
+      "  print(doc, target = filename)",
+      "}",
+      "",
+      "# Function to export table to PDF",
+      "export_to_pdf <- function(table, filename) {",
+      "  # Convert gt table to flextable",
+      "  ft <- as_flextable(table)",
+      "  ",
+      "  # Save as PDF",
+      "  save_as_docx(ft, path = filename)",
+      "}",
+      "",
+      "# Export the parameter table",
+      "export_to_word(parameter_table, 'output/Table_14_3_x_Parameter.docx')",
+      "export_to_pdf(parameter_table, 'output/Table_14_3_x_Parameter.pdf')"
+    ]
+  },
+  "fda_compliance": {
+    "regulatory_standards": [
+      "ICH E3 Guidelines",
+      "FDA Guidance for Industry: E3 Structure and Content of Clinical Study Reports",
+      "CDISC ADaM Implementation Guide",
+      "ICH E14 Guidelines for QT/QTc Studies"
+    ],
+    "required_elements": [
+      "population_definition",
+      "statistical_methodology",
+      "missing_data_handling",
+      "quality_checks",
+      "regulatory_footnotes"
+    ],
+    "quality_thresholds": {
+      "fda_compliance_score": 0.9,
+      "code_quality_score": 0.8,
+      "template_structure_score": 0.85
+    }
+  }
+} 

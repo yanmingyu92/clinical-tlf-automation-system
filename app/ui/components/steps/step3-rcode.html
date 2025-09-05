@@ -1,0 +1,70 @@
+<!-- Step 3: R Code Generation Component -->
+<!-- Extracted from real_ui.html for component-based architecture -->
+<div id="step3-container" class="step-container" style="display: none;">
+    <div class="step-section">
+        <h2>💻 STEP 3: R Code Generation</h2>
+        <p><strong>Generate high-quality R code based on your finalized template</strong></p>
+
+        <!-- Back Button -->
+        <div style="margin-bottom: 20px;">
+            <button onclick="goBackToStep2()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+                ← Back to Template
+            </button>
+        </div>
+
+        <!-- Template Summary -->
+        <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: #495057; margin-bottom: 15px;">📋 Finalized Template Summary</h3>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; white-space: pre-wrap;" id="step3-template-summary">
+                <!-- Template summary will be displayed here -->
+            </div>
+        </div>
+
+        <!-- R Code Generation Status -->
+        <div id="rcode-generation-status" style="background: rgba(255,193,7,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffc107;">
+            <h4 style="color: #856404; margin: 0;">🔄 Generating R Code...</h4>
+            <p style="color: #856404; margin: 5px 0 0 0;">Using real LLM to create professional R code based on your template</p>
+        </div>
+
+        <!-- R Code Display -->
+        <div id="rcode-display" style="background: rgba(255,255,255,0.95); padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 2px solid #6f42c1; display: none;">
+            <h3 style="color: #495057; margin-bottom: 20px; display: flex; align-items: center;">
+                <span style="font-size: 24px; margin-right: 10px;">💻</span>
+                Generated R Code
+            </h3>
+
+            <div id="rcode-content" style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #6f42c1; margin-bottom: 20px; font-family: 'Courier New', monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto;">
+                <!-- R code content will be displayed here -->
+            </div>
+
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button onclick="regenerateRCode()" style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    🔄 Regenerate R Code
+                </button>
+                <button onclick="editRCode()" style="background: #6f42c1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ✏️ Edit R Code
+                </button>
+                <button onclick="validateRCode()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ✅ Validate R Code
+                </button>
+                <button onclick="finalizeRCode()" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
+                    🚀 Execute R Code
+                </button>
+            </div>
+        </div>
+
+        <!-- R Code Editor (Hidden by default) -->
+        <div id="rcode-editor-section" style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
+            <h3 style="color: #495057; margin-bottom: 15px;">✏️ Edit R Code</h3>
+            <textarea id="rcode-editor" style="width: 100%; height: 400px; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Edit your R code here..."></textarea>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button onclick="saveRCodeEdits()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    💾 Save Changes
+                </button>
+                <button onclick="cancelRCodeEdit()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ❌ Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

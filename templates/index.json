@@ -1,0 +1,220 @@
+{
+  "templates": [
+    {
+      "id": "fda-ae-detailed-001",
+      "title": "Table 14.3.1 Summary of Adverse Events",
+      "type": "table",
+      "path": "fda_templates\\fda_ae_detailed_001.json",
+      "keywords": [
+        "table",
+        "summary",
+        "adverse",
+        "events"
+      ]
+    },
+    {
+      "id": "fda-baseline-characteristics-detailed-001",
+      "title": "Table 14.1.3 Baseline Characteristics",
+      "type": "table",
+      "path": "fda_templates\\fda_baseline_characteristics_detailed_001.json",
+      "keywords": [
+        "table",
+        "baseline",
+        "characteristics"
+      ]
+    },
+    {
+      "id": "fda-demographic-detailed-001",
+      "title": "Table 14.1.1 Demographic and Baseline Characteristics Summary",
+      "type": "table",
+      "path": "fda_templates\\fda_demographic_detailed_001.json",
+      "keywords": [
+        "table",
+        "demographic",
+        "baseline",
+        "characteristics",
+        "summary"
+      ]
+    },
+    {
+      "id": "fda-disposition-detailed-001",
+      "title": "Table 14.1.2 Subject Disposition",
+      "type": "table",
+      "path": "fda_templates\\fda_disposition_detailed_001.json",
+      "keywords": [
+        "table",
+        "subject",
+        "disposition"
+      ]
+    },
+    {
+      "id": "fda-ecg-detailed-001",
+      "title": "Table 14.3.4 ECG Evaluations Summary",
+      "type": "table",
+      "path": "fda_templates\\fda_ecg_detailed_001.json",
+      "keywords": [
+        "table",
+        "ecg",
+        "evaluations",
+        "summary"
+      ]
+    },
+    {
+      "id": "fda-efficacy-detailed-001",
+      "title": "Table 14.2.1 Primary Efficacy Endpoint Analysis",
+      "type": "table",
+      "path": "fda_templates\\fda_efficacy_detailed_001.json",
+      "keywords": [
+        "table",
+        "primary",
+        "efficacy",
+        "endpoint",
+        "analysis"
+      ]
+    },
+    {
+      "id": "fda-exposure-response-detailed-001",
+      "title": "Table 14.2.5 Exposure-Response Analysis",
+      "type": "table",
+      "path": "fda_templates\\fda_exposure_response_detailed_001.json",
+      "keywords": [
+        "table",
+        "exposure",
+        "response",
+        "analysis"
+      ]
+    },
+    {
+      "id": "fda-laboratory-detailed-001",
+      "title": "Table 14.3.3 Laboratory Evaluations Summary",
+      "type": "table",
+      "path": "fda_templates\\fda_laboratory_detailed_001.json",
+      "keywords": [
+        "table",
+        "laboratory",
+        "evaluations",
+        "summary"
+      ]
+    },
+    {
+      "id": "fda-lab-shifts-detailed-001",
+      "title": "Table 14.3.5 Laboratory Shifts Analysis",
+      "type": "table",
+      "path": "fda_templates\\fda_lab_shifts_detailed_001.json",
+      "keywords": [
+        "table",
+        "laboratory",
+        "shifts",
+        "analysis"
+      ]
+    },
+    {
+      "id": "fda-medical-history-detailed-001",
+      "title": "Table 14.1.2 Medical History",
+      "type": "table",
+      "path": "fda_templates\\fda_medical_history_detailed_001.json",
+      "keywords": [
+        "table",
+        "medical",
+        "history"
+      ]
+    },
+    {
+      "id": "fda-pk-detailed-001",
+      "title": "Table 14.4.1 Pharmacokinetic Parameters Summary",
+      "type": "table",
+      "path": "fda_templates\\fda_pk_detailed_001.json",
+      "keywords": [
+        "table",
+        "pharmacokinetic",
+        "parameters",
+        "summary"
+      ]
+    },
+    {
+      "id": "fda-qol-pro-detailed-001",
+      "title": "Table 14.2.4 Quality of Life and Patient Reported Outcomes",
+      "type": "table",
+      "path": "fda_templates\\fda_qol_pro_detailed_001.json",
+      "keywords": [
+        "table",
+        "quality",
+        "life",
+        "patient",
+        "reported",
+        "outcomes"
+      ]
+    },
+    {
+      "id": "fda-responder-analysis-detailed-001",
+      "title": "Table 14.2.3 Responder Analysis",
+      "type": "table",
+      "path": "fda_templates\\fda_responder_analysis_detailed_001.json",
+      "keywords": [
+        "table",
+        "responder",
+        "analysis"
+      ]
+    },
+    {
+      "id": "fda-secondary-efficacy-detailed-001",
+      "title": "Table 14.2.2 Secondary Efficacy Endpoints Analysis",
+      "type": "table",
+      "path": "fda_templates\\fda_secondary_efficacy_detailed_001.json",
+      "keywords": [
+        "table",
+        "secondary",
+        "efficacy",
+        "endpoints",
+        "analysis"
+      ]
+    },
+    {
+      "id": "fda-sensitivity-analysis-detailed-001",
+      "title": "Table 14.3.2 Sensitivity Analyses",
+      "type": "table",
+      "path": "fda_templates\\fda_sensitivity_analysis_detailed_001.json",
+      "keywords": [
+        "table",
+        "sensitivity",
+        "analyses"
+      ]
+    },
+    {
+      "id": "fda-subgroup-analysis-detailed-001",
+      "title": "Table 14.3.1 Subgroup Analyses",
+      "type": "table",
+      "path": "fda_templates\\fda_subgroup_analysis_detailed_001.json",
+      "keywords": [
+        "table",
+        "subgroup",
+        "analyses"
+      ]
+    },
+    {
+      "id": "fda-vital-shifts-detailed-001",
+      "title": "Table 14.3.6 Vital Signs Shifts Analysis",
+      "type": "table",
+      "path": "fda_templates\\fda_vital_shifts_detailed_001.json",
+      "keywords": [
+        "table",
+        "vital",
+        "signs",
+        "shifts",
+        "analysis"
+      ]
+    },
+    {
+      "id": "fda-vital-signs-detailed-001",
+      "title": "Table 14.3.2 Vital Signs Summary",
+      "type": "table",
+      "path": "fda_templates\\fda_vital_signs_detailed_001.json",
+      "keywords": [
+        "table",
+        "vital",
+        "signs",
+        "summary"
+      ]
+    }
+  ]
+}

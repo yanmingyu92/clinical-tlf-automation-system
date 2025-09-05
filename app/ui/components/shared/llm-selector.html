@@ -1,0 +1,11 @@
+<!-- LLM Selector Component -->
+<div class="llm-selector">
+    <div>
+        <label for="llm-provider">🤖 LLM Provider:</label>
+        <select id="llm-provider" onchange="changeLLMProvider()">
+            <option value="deepseek">DeepSeek (Fast & Reliable)</option>
+            <option value="claude">Claude (Advanced Reasoning)</option>
+        </select>
+    </div>
+    <div class="llm-status" id="llm-status">Loading providers...</div>
+</div>

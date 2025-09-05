@@ -1,0 +1,85 @@
+<!-- Step 2: Template Generation & Editing Component -->
+<div id="step2-container" class="step-container" style="display: none;">
+    <div class="step-section">
+        <h2>🎨 STEP 2: Template Generation & Editing</h2>
+        <p><strong>Review and customize the generated template based on your analysis</strong></p>
+
+        <!-- Back Button -->
+        <div style="margin-bottom: 20px;">
+            <button onclick="goBackToStep1()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+                ← Back to Analysis
+            </button>
+        </div>
+
+        <!-- Analysis Summary -->
+        <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: #495057; margin-bottom: 15px;">📊 Analysis Summary</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div>
+                    <strong>Domain:</strong><br>
+                    <span id="step2-domain" style="color: #28a745; font-weight: bold;">-</span>
+                </div>
+                <div>
+                    <strong>ADaM Dataset:</strong><br>
+                    <span id="step2-dataset" style="color: #dc3545; font-weight: bold;">-</span>
+                </div>
+                <div>
+                    <strong>Similarity:</strong><br>
+                    <span id="step2-similarity" style="color: #17a2b8; font-weight: bold;">-</span>
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <strong>Selected Template:</strong><br>
+                <span id="step2-template-title" style="color: #6f42c1; font-weight: bold;">-</span><br>
+                <small id="step2-template-desc" style="color: #6c757d;">-</small>
+            </div>
+        </div>
+
+        <!-- Template Generation Status -->
+        <div id="template-generation-status" style="background: rgba(255,193,7,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffc107;">
+            <h4 style="color: #856404; margin: 0;">🔄 Generating High-Quality Template...</h4>
+            <p style="color: #856404; margin: 5px 0 0 0;">Using real LLM to create a professional template based on your analysis</p>
+        </div>
+
+        <!-- Template Display -->
+        <div id="template-display" style="background: rgba(255,255,255,0.95); padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 2px solid #28a745; display: none;">
+            <h3 style="color: #495057; margin-bottom: 20px; display: flex; align-items: center;">
+                <span style="font-size: 24px; margin-right: 10px;">📋</span>
+                Generated Template
+            </h3>
+
+            <div id="template-content" style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 20px; font-family: 'Courier New', monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto;">
+                <!-- Template content will be displayed here -->
+            </div>
+
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button onclick="regenerateTemplate()" style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    🔄 Regenerate Template
+                </button>
+                <button onclick="editTemplate()" style="background: #6f42c1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ✏️ Edit Template
+                </button>
+                <button onclick="validateTemplate()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ✅ Validate Template
+                </button>
+                <button onclick="finalizeTemplate()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+                    🎯 Finalize & Generate R Code
+                </button>
+            </div>
+        </div>
+
+        <!-- Template Editor (Hidden by default) -->
+        <div id="template-editor-section" style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
+            <h3 style="color: #495057; margin-bottom: 15px;">✏️ Edit Template Content</h3>
+            <textarea id="template-editor" style="width: 100%; height: 350px; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px;" placeholder="Edit your template content here..."></textarea>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button onclick="saveTemplateEdits()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    💾 Save Changes
+                </button>
+                <button onclick="cancelTemplateEdit()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ❌ Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

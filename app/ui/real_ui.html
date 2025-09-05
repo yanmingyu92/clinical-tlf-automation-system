@@ -1,0 +1,2730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Clinical TLF Automation - Real AI Backend</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Component (Extracted) -->
+        <div id="header-component-legacy"></div>
+
+        <!-- Status Bar Component (Extracted) -->
+        <div id="status-bar-component-legacy"></div>
+
+        <!-- LLM Selector Component (Extracted) -->
+        <div id="llm-selector-component-legacy"></div>
+
+        <!-- JavaScript Modules -->
+        <script src="js/utilities.js"></script>
+        <script src="js/navigation-functions.js"></script>
+        <script src="js/step1-functions.js"></script>
+        <script src="js/step2-functions.js"></script>
+        <script src="js/step3-functions.js"></script>
+        <script src="js/step4-functions.js"></script>
+
+        <!-- Main Application Script -->
+        <script src="js/main.js"></script>
+
+        <!-- Progress Indicator Component (Extracted) -->
+        <div id="progress-indicator-component-legacy"></div>
+
+        <div class="content">
+            <!-- Step Components (Extracted to separate files) -->
+            <div id="step1-component-legacy"></div>
+
+            <div id="step2-component-legacy"></div>
+
+            <div id="step3-component-legacy"></div>
+
+            <div id="step4-component-legacy"></div>
+
+
+
+
+
+        </div>
+        <!-- END MAIN CONTENT -->
+        </div>
+
+        <!-- Footer Component (Extracted) -->
+        <div id="footer-component-legacy"></div>
+    </div>
+
+    <!-- Component Loading Script -->
+    <script>
+        // Load components for legacy compatibility
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔄 Loading components for legacy UI...');
+            console.log('Current URL:', window.location.href);
+            console.log('Base URL:', window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/'));
+
+            try {
+                // Use absolute paths from server root for real_backend_server.py
+                const components = [
+                    { id: 'header-component-legacy', path: '/components/layout/header.html' },
+                    { id: 'status-bar-component-legacy', path: '/components/shared/status-bar.html' },
+                    { id: 'llm-selector-component-legacy', path: '/components/shared/llm-selector.html' },
+                    { id: 'progress-indicator-component-legacy', path: '/components/shared/progress-indicator.html' },
+                    { id: 'step1-component-legacy', path: '/components/steps/step1-query.html' },
+                    { id: 'step2-component-legacy', path: '/components/steps/step2-template.html' },
+                    { id: 'step3-component-legacy', path: '/components/steps/step3-rcode.html' },
+                    { id: 'step4-component-legacy', path: '/components/steps/step4-execution.html' },
+                    { id: 'footer-component-legacy', path: '/components/layout/footer.html' }
+                ];
+
+                // Load all components
+                const loadPromises = components.map(async (component) => {
+                    try {
+                        console.log(`🔄 Attempting to load: ${component.path}`);
+                        const response = await fetch(component.path);
+                        console.log(`📡 Response for ${component.path}:`, response.status, response.statusText);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+
+                        const html = await response.text();
+                        console.log(`📄 Content length for ${component.id}:`, html.length);
+
+                        const element = document.getElementById(component.id);
+                        if (element) {
+                            element.innerHTML = html;
+                            console.log(`✅ Successfully loaded: ${component.id}`);
+                        } else {
+                            console.warn(`⚠️ Element not found: ${component.id}`);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Failed to load ${component.id}:`, error);
+                        console.error(`   Path attempted: ${component.path}`);
+
+                        // Show detailed error in UI
+                        const element = document.getElementById(component.id);
+                        if (element) {
+                            element.innerHTML = `
+                                <div style="color: #dc3545; padding: 10px; background: #f8d7da; border-radius: 5px; margin: 10px 0; border: 1px solid #f5c6cb;">
+                                    <strong>⚠️ Component Load Error</strong><br>
+                                    <small>Component: ${component.id}</small><br>
+                                    <small>Path: ${component.path}</small><br>
+                                    <small>Error: ${error.message}</small><br>
+                                    <button onclick="location.reload()" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-top: 5px;">
+                                        🔄 Retry
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+
+                await Promise.all(loadPromises);
+                console.log('🎯 Component loading process completed');
+
+            } catch (error) {
+                console.error('❌ Critical error in component loading:', error);
+            }
+        });
+    </script>
+
+    <script>
+
+        // Global variables accessible from anywhere (don't override if already set)
+        if (typeof window.backendStatus === 'undefined') {
+            window.backendStatus = 'connecting';
+        }
+        if (typeof window.realComponents === 'undefined') {
+            window.realComponents = {};
+        }
+
+        // Interactive session state variables - use window object to avoid conflicts
+        if (typeof window.isExecuting === 'undefined') {
+            window.isExecuting = false;
+        }
+        if (typeof window.interactiveSession === 'undefined') {
+            window.interactiveSession = null;
+        }
+
+        // Also create local references for backward compatibility
+        let backendStatus = window.backendStatus;
+        let realComponents = window.realComponents;
+
+        function updateStatusIndicator(status) {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+
+            if (status.status === 'ready') {
+                statusDot.classList.add('ready');
+                statusText.textContent = '✅ Real AI backend ready';
+                statusText.style.color = '#28a745';
+            } else if (status.status === 'initializing') {
+                statusDot.classList.remove('ready');
+                statusText.textContent = '🔄 Initializing real AI components...';
+                statusText.style.color = '#ffc107';
+            } else {
+                statusDot.classList.remove('ready');
+                statusText.textContent = '❌ Backend connection error';
+                statusText.style.color = '#dc3545';
+            }
+        }
+
+        function updateComponentStatus(status) {
+            const componentDiv = document.getElementById('component-status');
+
+            if (status.status === 'ready') {
+                componentDiv.innerHTML = `
+                    <strong>✅ Real AI Components Status:</strong><br>
+                    • MultiLLMClient: ${status.components.llm_client ? '✅ Loaded' : '❌ Failed'}<br>
+                    • RAG System: ${status.components.rag_system ? '✅ Loaded' : '❌ Failed'}<br>
+                    • Dataset Explorer: ${status.components.llm_client ? '✅ Available' : '❌ Failed'}<br>
+                    • Debug Agent: ${status.components.llm_client ? '✅ Available' : '❌ Failed'}<br>
+                    <strong>🎯 Ready for real AI analysis!</strong>
+                `;
+                componentDiv.style.background = '#d4edda';
+                componentDiv.style.border = '1px solid #28a745';
+            } else if (status.status === 'initializing') {
+                componentDiv.innerHTML = '🔄 Initializing real AI components... Please wait.';
+                componentDiv.style.background = '#fff3cd';
+                componentDiv.style.border = '1px solid #ffc107';
+            } else {
+                componentDiv.innerHTML = `❌ Backend error: ${status.error || 'Connection failed'}`;
+                componentDiv.style.background = '#f8d7da';
+                componentDiv.style.border = '1px solid #dc3545';
+            }
+        }
+
+        // Removed broken analyzeQuerySimple function - using analyzeQueryReal instead
+
+        window.analyzeQueryReal = async function analyzeQueryReal() {
+            console.log('🔧 analyzeQueryReal function called!');
+
+            const query = document.getElementById('query').value;
+            const domain = document.getElementById('domain').value;
+            const complexity = document.getElementById('complexity').value;
+
+            console.log('🔧 Form values:', { query, domain, complexity });
+
+            if (!query.trim()) {
+                alert('Please enter a query to analyze');
+                return;
+            }
+
+            console.log('🔧 Backend status check:', window.backendStatus);
+
+            if (window.backendStatus !== 'ready') {
+                alert('Real AI backend is not ready. Please wait for initialization to complete. Current status: ' + window.backendStatus);
+                return;
+            }
+
+            console.log('🔧 Backend status OK, proceeding with analysis...');
+
+            const btn = document.getElementById('analyze-btn');
+            btn.textContent = '🔄 Real AI Analysis in Progress...';
+            btn.disabled = true;
+
+            try {
+                // Create AbortController for timeout control
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        domain: domain,
+                        complexity: complexity
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Store results for Step 2
+                    window.lastAnalysisResult = result;
+
+                    // Debug: Log the actual response structure
+                    console.log('🔍 Full response structure:', result);
+                    console.log('🔍 Response keys:', Object.keys(result));
+
+                    try {
+                        displayRealAnalysisResults(result);
+                    } catch (displayError) {
+                        console.error('Display function error:', displayError);
+                        alert('Analysis completed but display failed. Check console for details.');
+                    }
+
+                    // Populate dataset path with AI suggestion
+                    populateDatasetPath(result);
+
+                    btn.textContent = '✅ Real AI Analysis Complete';
+                    btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+
+                    // Show success message with key results
+                    alert('Analysis completed successfully! Domain: ' + result.domain_detected + ', Complexity: ' + result.complexity_level);
+                } else {
+                    throw new Error(result.error || 'Analysis failed');
+                }
+
+            } catch (error) {
+                console.error('Real analysis error:', error);
+                if (error.name === 'AbortError') {
+                    alert('Real AI analysis timed out after 2 minutes. The analysis may still be processing on the server. Please try again in a moment.');
+                    btn.textContent = '⏱️ Analysis Timed Out - Try Again';
+                } else {
+                    alert(`Real AI analysis failed: ${error.message}`);
+                    btn.textContent = '❌ Analysis Failed - Try Again';
+                }
+                btn.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function populateDatasetPath(result) {
+            // Extract suggested dataset name from analysis results
+            let suggestedDataset = '';
+
+            // Use the adam_dataset field from the backend analysis
+            if (result.adam_dataset) {
+                suggestedDataset = result.adam_dataset;
+                console.log('📊 Using AI-suggested dataset:', suggestedDataset);
+            } else if (result.domain_detected) {
+                // Fallback mapping if adam_dataset is not available
+                const domainToDataset = {
+                    'demographics': 'adsl',
+                    'adverse': 'adae',
+                    'adverse_events': 'adae',
+                    'efficacy': 'adtte',
+                    'laboratory': 'adlb',
+                    'vital_signs': 'advs',
+                    'exposure': 'adex'
+                };
+                suggestedDataset = domainToDataset[result.domain_detected] || 'adsl';
+                console.log('📊 Using domain-mapped dataset:', suggestedDataset);
+            } else {
+                suggestedDataset = 'adsl'; // Default fallback
+                console.log('📊 Using default dataset:', suggestedDataset);
+            }
+
+            // Construct full path
+            const suggestedPath = `data/adam/${suggestedDataset}.sas7bdat`;
+
+            // Populate the dataset path input
+            const datasetPathInput = document.getElementById('dataset-path');
+            if (datasetPathInput) {
+                datasetPathInput.value = suggestedPath;
+                console.log('📊 Populated dataset path:', suggestedPath);
+
+                // Auto-trigger dataset exploration for better R code generation
+                console.log('🔄 Auto-triggering dataset exploration...');
+                setTimeout(() => {
+                    exploreDataset();
+                }, 1500); // Give time for UI to update
+            }
+        }
+
+        function generateRAGResultsHTML(ragResults) {
+            if (!ragResults || ragResults.length === 0) {
+                return '';
+            }
+
+            let ragHTML = `
+                <div style="background: rgba(108, 117, 125, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #6c757d; margin-top: 15px;">
+                    <strong style="color: #6c757d;">🔍 RAG Template Retrieval Results:</strong><br>
+                    <small style="color: #6c757d; margin-bottom: 10px; display: block;">Found ${ragResults.length} relevant template(s)</small>
+                    <div style="max-height: 200px; overflow-y: auto;">`;
+
+            ragResults.slice(0, 3).forEach((template, index) => {
+                const title = template.title || template.metadata?.title || 'Unknown Template';
+                const similarity = template.similarity || template.similarity_score || 0;
+                const dataset = template.metadata?.dataset_name || 'Unknown Dataset';
+
+                ragHTML += `
+                    <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #007bff;">
+                        <div style="font-weight: bold; color: #007bff; font-size: 14px;">${index + 1}. ${title}</div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 3px;">
+                            📊 Dataset: ${dataset} |
+                            🎯 Similarity: ${(similarity * 100).toFixed(1)}%
+                        </div>
+                    </div>`;
+            });
+
+            ragHTML += `
+                    </div>
+                </div>`;
+
+            return ragHTML;
+        }
+
+        function displayRealAnalysisResults(result) {
+            console.log('🎯 displayRealAnalysisResults called with:', result);
+            console.log('🔍 RAG results data:', result.rag_results);
+            console.log('🔍 RAG results length:', result.rag_results ? result.rag_results.length : 'undefined');
+
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('analysis-content');
+
+            if (!contentDiv) {
+                console.error('❌ analysis-content element not found!');
+                return;
+            }
+
+            // Use safe property access with fallbacks
+            const domain = (result.domain_detected || 'Unknown').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const complexity = (result.complexity_level || 'Unknown').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const dataset = result.adam_dataset || 'Not specified';
+
+            // Generate RAG results HTML first
+            const ragResultsHTML = generateRAGResultsHTML(result.rag_results || []);
+            console.log('🔍 Generated RAG HTML:', ragResultsHTML);
+
+            // Create simple, working display
+            contentDiv.innerHTML = `
+                <div style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%); padding: 20px; border-radius: 10px; margin: 10px 0; border: 2px solid #28a745;">
+                    <h4 style="color: #28a745; margin: 0 0 15px 0;">🔬 REAL AI ANALYSIS RESULTS</h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <strong style="color: #495057;">🏥 Domain Detected:</strong><br>
+                            <span style="color: #28a745; font-weight: bold; font-size: 16px;">${domain}</span>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <strong style="color: #495057;">📋 Complexity Level:</strong><br>
+                            <span style="color: #17a2b8; font-weight: bold; font-size: 16px;">${complexity}</span>
+                        </div>
+                    </div>
+
+                    ${dataset !== 'Not specified' ?
+                    '<div style="background: rgba(23, 162, 184, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #17a2b8;">' +
+                        '<strong style="color: #17a2b8;">📊 Suggested ADaM Dataset:</strong><br>' +
+                        '<span style="color: #17a2b8; font-weight: bold; font-size: 18px;">' + dataset.toUpperCase() + '</span><br>' +
+                        '<small style="color: #6c757d;">AI-recommended dataset based on query analysis</small>' +
+                    '</div>' : ''}
+
+                    ${ragResultsHTML}
+
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; border: 2px solid #28a745; margin-top: 15px; text-align: center;">
+                        <strong style="color: #155724; font-size: 16px;">✅ Analysis Complete - Ready for Next Step</strong><br>
+                        <small style="color: #6c757d;">Real AI analysis completed successfully</small>
+                        <div style="margin-top: 15px;">
+                            <button id="next-step-btn" onclick="goToNextStep()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; color: white; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); transition: all 0.3s ease;">
+                                🚀 Proceed to Template Generation
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Show the results section
+            if (resultsDiv) {
+                resultsDiv.style.display = 'block';
+                resultsDiv.classList.add('show');
+            }
+
+            console.log('✅ Results displayed successfully');
+        }
+
+        async function exploreDataset() {
+            const datasetPath = document.getElementById('dataset-path').value;
+
+            if (!datasetPath.trim()) {
+                alert('Please enter a dataset path');
+                return;
+            }
+
+            const exploreBtn = document.getElementById('explore-dataset-btn');
+            const originalText = exploreBtn.innerHTML;
+
+            try {
+                // Show loading state
+                exploreBtn.innerHTML = '🔄 Exploring...';
+                exploreBtn.disabled = true;
+
+                console.log('🔍 Exploring dataset:', datasetPath);
+
+                const response = await fetch('/explore_dataset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dataset_path: datasetPath
+                    })
+                });
+
+                const result = await response.json();
+                console.log('📊 Dataset exploration result:', result);
+
+                if (result.success) {
+                    // Store dataset exploration results for Step 4 R execution
+                    window.datasetExplorationResult = result;
+                    window.currentDatasetPath = datasetPath;
+                    console.log('💾 Stored dataset exploration results for R execution');
+
+                    displayDatasetExploration(result);
+                } else {
+                    displayDatasetExplorationError(result.error || 'Unknown error occurred');
+                }
+
+            } catch (error) {
+                console.error('❌ Dataset exploration error:', error);
+                displayDatasetExplorationError('Network error: ' + error.message);
+            } finally {
+                // Restore button state
+                exploreBtn.innerHTML = originalText;
+                exploreBtn.disabled = false;
+            }
+        }
+
+        function displayDatasetExploration(result) {
+            const explorationDiv = document.getElementById('dataset-exploration');
+            const contentDiv = document.getElementById('dataset-exploration-content');
+
+            const datasetInfo = result.dataset_info || {};
+            const variables = datasetInfo.variables || {};
+
+            let variablesHtml = '';
+            if (Object.keys(variables).length > 0) {
+                variablesHtml = `
+                    <div style="margin-top: 15px;">
+                        <h5 style="margin: 0 0 10px 0; color: #495057;">📋 Variables (${Object.keys(variables).length})</h5>
+                        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 5px;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <thead style="background: #e9ecef; position: sticky; top: 0;">
+                                    <tr>
+                                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #dee2e6;">Variable</th>
+                                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #dee2e6;">Type</th>
+                                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #dee2e6;">Unique Values</th>
+                                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #dee2e6;">Missing</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+                Object.entries(variables).forEach(([varName, varInfo]) => {
+                    variablesHtml += `
+                        <tr style="border-bottom: 1px solid #f8f9fa;">
+                            <td style="padding: 6px 8px; font-weight: 500;">${varName}</td>
+                            <td style="padding: 6px 8px; color: #6c757d;">${varInfo.type || 'Unknown'}</td>
+                            <td style="padding: 6px 8px; text-align: center;">${varInfo.unique_values || 0}</td>
+                            <td style="padding: 6px 8px; text-align: center;">${varInfo.missing_count || 0}</td>
+                        </tr>
+                    `;
+                });
+
+                variablesHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            contentDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border: 1px solid #dee2e6;">
+                        <div style="font-size: 24px; font-weight: bold; color: ${datasetInfo.success ? '#28a745' : '#dc3545'};">
+                            ${datasetInfo.success ? '✅' : '❌'}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Dataset Status</div>
+                        <div style="font-weight: 500; margin-top: 2px;">${datasetInfo.success ? 'Found' : 'Not Found'}</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border: 1px solid #dee2e6;">
+                        <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">
+                            ${datasetInfo.nrows || 0}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Records</div>
+                    </div>
+
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border: 1px solid #dee2e6;">
+                        <div style="font-size: 24px; font-weight: bold; color: #6f42c1;">
+                            ${datasetInfo.ncols || 0}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">Variables</div>
+                    </div>
+                </div>
+
+                ${datasetInfo.file_path ? `
+                    <div style="margin-bottom: 15px; padding: 10px; background: #e7f3ff; border-radius: 5px; border-left: 4px solid #17a2b8;">
+                        <strong>📁 File Path:</strong> ${datasetInfo.file_path}
+                    </div>
+                ` : ''}
+
+                ${variablesHtml}
+            `;
+
+            explorationDiv.style.display = 'block';
+
+            // Store dataset info for use in later steps
+            window.currentDatasetInfo = result;
+
+            // Show success message
+            console.log('✅ Dataset exploration completed and stored for R code generation');
+        }
+
+        function displayDatasetExplorationError(error) {
+            const explorationDiv = document.getElementById('dataset-exploration');
+            const contentDiv = document.getElementById('dataset-exploration-content');
+
+            contentDiv.innerHTML = `
+                <div style="text-align: center; padding: 20px; background: #f8d7da; border-radius: 5px; border: 1px solid #dc3545; color: #721c24;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">Dataset Exploration Failed</div>
+                    <div style="font-size: 14px;">${error}</div>
+                </div>
+            `;
+
+            explorationDiv.style.display = 'block';
+        }
+
+        // NOTE: goToNextStep() and goBackToStep1() functions moved to js/step2-functions.js
+
+        // NOTE: loadTemplateGeneration() function moved to js/step2-functions.js
+
+        // Step 2 Functions - Template Generation & Management
+        // NOTE: All Step 2 functions have been moved to js/step2-functions.js
+
+        // NOTE: All Step 2 template management functions moved to js/step2-functions.js
+
+        // NOTE: goToStep3() and goBackToStep2() functions moved to js/step3-functions.js
+
+        function regenerateRCode() {
+            const templateContent = document.getElementById('template-editor').value;
+            const analysisResults = window.lastAnalysisResult;
+
+            if (!templateContent) {
+                alert('Please ensure template content is available first.');
+                return;
+            }
+
+            // Call backend to regenerate R code
+            fetch('/regenerate_rcode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    template_content: templateContent,
+                    domain: analysisResults?.domain_detected,
+                    dataset: analysisResults?.adam_dataset
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('rcode-editor').value = data.r_code;
+                    alert('✅ R code regenerated successfully!');
+                } else {
+                    alert('❌ Error regenerating R code: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error: ' + error);
+            });
+        }
+
+        function validateTemplate() {
+            const templateContent = document.getElementById('template-editor').value;
+            if (!templateContent) {
+                alert('No template content to validate.');
+                return;
+            }
+
+            // Simple validation
+            if (templateContent.length < 50) {
+                alert('⚠️ Template seems too short. Please check the content.');
+            } else {
+                alert('✅ Template validation passed!');
+            }
+        }
+
+        function validateRCode() {
+            const rCode = document.getElementById('rcode-editor').value;
+            if (!rCode) {
+                alert('No R code to validate.');
+                return;
+            }
+
+            // Call backend to validate R code
+            fetch('/validate_rcode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    r_code: rCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    alert('✅ R code validation passed!');
+                } else {
+                    alert('❌ R code validation failed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error validating R code: ' + error);
+            });
+        }
+
+
+
+        function downloadTemplate() {
+            const templateContent = document.getElementById('template-editor').value;
+            const rCode = document.getElementById('rcode-editor').value;
+
+            if (!templateContent && !rCode) {
+                alert('No content to download.');
+                return;
+            }
+
+            // Create download content
+            const content = `# Clinical TLF Template\n# Generated by Real AI Backend\n\n## Template Content:\n${templateContent}\n\n## R Code:\n${rCode}`;
+
+            // Create and trigger download
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'clinical_tlf_template.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            alert('📥 Template downloaded successfully!');
+        }
+
+        // NOTE: downloadTemplate() function moved to js/step2-functions.js
+
+        // Step 3 Functions - R Code Generation
+        // NOTE: All Step 3 functions have been moved to js/step3-functions.js
+
+        // Step 4 Functions - Code Execution & Results
+        // NOTE: Most Step 4 functions have been moved to js/step4-functions.js
+        // Only navigation functions remain here for now
+
+        // NOTE: goToStep4() and goBackToStep3() functions moved to js/step3-functions.js and js/step4-functions.js
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('execution-mode-dropdown');
+            const modeBtn = document.getElementById('execution-mode-btn');
+
+            if (dropdown && modeBtn && !dropdown.contains(event.target) && !modeBtn.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load R code from Step 3 if available
+            setTimeout(() => {
+                loadRCodeOnPageLoad();
+            }, 100);
+        });
+
+        // STEP NAVIGATION FUNCTIONS
+        function goToStepDirect(stepNumber) {
+            console.log(`🎯 Direct navigation to Step ${stepNumber}`);
+
+            // Hide all steps
+            document.getElementById('step1-container').style.display = 'none';
+            document.getElementById('step2-container').style.display = 'none';
+            document.getElementById('step3-container').style.display = 'none';
+            document.getElementById('step4-container').style.display = 'none';
+
+            // Show selected step
+            const targetContainer = document.getElementById(`step${stepNumber}-container`);
+            if (targetContainer) {
+                targetContainer.style.display = 'block';
+                updateProgressIndicator(stepNumber);
+
+                // Load step-specific content
+                switch(stepNumber) {
+                    case 1:
+                        console.log('📍 Navigated to Step 1 - Query Input');
+                        break;
+                    case 2:
+                        console.log('📍 Navigated to Step 2 - Template Generation');
+                        if (window.lastAnalysisResult) {
+                            loadTemplateGeneration();
+                        } else {
+                            console.warn('⚠️ No analysis results - Step 1 may need to be completed first');
+                        }
+                        break;
+                    case 3:
+                        console.log('📍 Navigated to Step 3 - R Code Generation');
+                        if (window.currentTemplate) {
+                            loadRCodeGeneration();
+                        } else {
+                            console.warn('⚠️ No template available - Step 2 may need to be completed first');
+                        }
+                        break;
+                    case 4:
+                        console.log('📍 Navigated to Step 4 - Code Execution');
+                        if (window.currentRCode) {
+                            loadStep4Interface();
+                        } else {
+                            console.warn('⚠️ No R code available - Step 3 may need to be completed first');
+                        }
+                        break;
+                }
+            } else {
+                console.error(`❌ Step ${stepNumber} container not found`);
+            }
+        }
+
+        function updateProgressIndicator(currentStep) {
+            console.log(`🎯 Updating progress indicator to Step ${currentStep}`);
+
+            // Get all progress step elements
+            const progressSteps = document.querySelectorAll('.progress-step');
+
+            // Remove active class from all steps and update their appearance
+            progressSteps.forEach((step, index) => {
+                const stepNumber = index + 1;
+                const icon = step.querySelector('.progress-icon');
+
+                // Remove active class
+                step.classList.remove('active');
+
+                if (stepNumber === currentStep) {
+                    // Current step - make it active (blue)
+                    step.classList.add('active');
+                    if (icon) icon.textContent = '🔄'; // Active icon
+                } else if (stepNumber < currentStep) {
+                    // Completed steps - show as completed (green)
+                    if (icon) icon.textContent = '✅'; // Completed icon
+                } else {
+                    // Future steps - show as pending (gray)
+                    if (icon) icon.textContent = '⏳'; // Pending icon
+                }
+            });
+
+            console.log(`✅ Progress indicator updated - Step ${currentStep} is now active`);
+        }
+
+        // ========================================
+        // REMOVED: Interactive Code Interpreter Functions - Not used by UI
+        // ========================================
+
+        function showCodeDiff(oldCode, newCode) {
+            // Simple diff display - highlight changes
+            const diffElement = document.getElementById('code-diff');
+
+            const oldLines = oldCode.split('\n');
+            const newLines = newCode.split('\n');
+
+            let diffHTML = '';
+            const maxLines = Math.max(oldLines.length, newLines.length);
+
+            for (let i = 0; i < maxLines; i++) {
+                const oldLine = oldLines[i] || '';
+                const newLine = newLines[i] || '';
+
+                if (oldLine !== newLine) {
+                    if (oldLine) {
+                        diffHTML += `<div style="background: #ffebee; color: #c62828; padding: 2px 5px;">- ${oldLine}</div>`;
+                    }
+                    if (newLine) {
+                        diffHTML += `<div style="background: #e8f5e8; color: #2e7d32; padding: 2px 5px;">+ ${newLine}</div>`;
+                    }
+                } else if (oldLine) {
+                    diffHTML += `<div style="padding: 2px 5px;">${oldLine}</div>`;
+                }
+            }
+
+            diffElement.innerHTML = diffHTML;
+        }
+
+        function showInteractiveOptions(options) {
+            const aiLog = document.getElementById('ai-communication-log');
+            const optionsHTML = options.map(option => {
+                switch(option) {
+                    case 'approve':
+                        return `<button onclick="approveCodeChanges()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin: 5px;">✅ Approve Changes</button>`;
+                    case 'reject':
+                        return `<button onclick="rejectCodeChanges()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin: 5px;">❌ Reject Changes</button>`;
+                    case 'edit':
+                        return `<button onclick="editCurrentCode()" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin: 5px;">✏️ Edit Code</button>`;
+                    case 'retry':
+                        return `<button onclick="retryIteration()" style="background: #fd7e14; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin: 5px;">🔄 Retry</button>`;
+                    case 'stop':
+                        return `<button onclick="stopInteractiveExecution()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin: 5px;">⏹️ Stop</button>`;
+                    default:
+                        return '';
+                }
+            }).join('');
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'interactive-options';
+            optionsDiv.style.cssText = 'margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; text-align: center;';
+            optionsDiv.innerHTML = `<div style="margin-bottom: 10px; font-weight: bold; color: #495057;">Choose an action:</div>${optionsHTML}`;
+
+            // Remove existing options
+            const existingOptions = aiLog.querySelector('.interactive-options');
+            if (existingOptions) {
+                existingOptions.remove();
+            }
+
+            aiLog.appendChild(optionsDiv);
+            aiLog.scrollTop = aiLog.scrollHeight;
+        }
+
+        // REMOVED: Interactive execution control functions - Not used by UI
+
+        function switchCodeTab(tab) {
+            // Update tab buttons
+            document.getElementById('tab-original').style.background = tab === 'original' ? '#007bff' : '#6c757d';
+            document.getElementById('tab-current').style.background = tab === 'current' ? '#007bff' : '#6c757d';
+            document.getElementById('tab-diff').style.background = tab === 'diff' ? '#007bff' : '#6c757d';
+
+            // Show/hide content
+            document.getElementById('code-original').style.display = tab === 'original' ? 'block' : 'none';
+            document.getElementById('code-current').style.display = tab === 'current' ? 'block' : 'none';
+            document.getElementById('code-diff').style.display = tab === 'diff' ? 'block' : 'none';
+        }
+
+        // ========================================
+        // NEW: Integrated Code Execution System Functions
+        // ========================================
+
+        // Global system state
+        window.integratedExecutionSystem = {
+            isActive: false,
+            isRunning: false,
+            currentIteration: 0,
+            maxIterations: 3,
+            originalCode: '',
+            currentCode: '',
+            executionLog: [],
+            aiMessages: [],
+            startTime: null,
+            filesGenerated: [],
+            // NEW: Code version tracking
+            codeVersions: [],
+            currentVersionIndex: 0
+        };
+
+        // ========================================
+        // PRIORITY 3: Code Version Tracking System
+        // ========================================
+
+        class CodeVersionManager {
+            constructor() {
+                this.versions = [];
+                this.currentIndex = 0;
+            }
+
+            addVersion(code, iteration, status, description = '') {
+                // Add new code version
+                const version = {
+                    id: this.versions.length,
+                    code: code,
+                    iteration: iteration,
+                    status: status, // 'original', 'modified', 'fixed', 'final'
+                    description: description,
+                    timestamp: new Date().toISOString(),
+                    changes: this.versions.length > 0 ? this.calculateChanges(this.versions[this.versions.length - 1].code, code) : []
+                };
+
+                this.versions.push(version);
+                this.currentIndex = this.versions.length - 1;
+
+                // Update UI
+                this.updateVersionDisplay();
+
+                return version;
+            }
+
+            calculateChanges(oldCode, newCode) {
+                // Simple line-by-line diff calculation
+                const oldLines = oldCode.split('\n');
+                const newLines = newCode.split('\n');
+                const changes = [];
+
+                const maxLines = Math.max(oldLines.length, newLines.length);
+                for (let i = 0; i < maxLines; i++) {
+                    const oldLine = oldLines[i] || '';
+                    const newLine = newLines[i] || '';
+
+                    if (oldLine !== newLine) {
+                        changes.push({
+                            lineNumber: i + 1,
+                            type: oldLine ? (newLine ? 'modified' : 'deleted') : 'added',
+                            oldLine: oldLine,
+                            newLine: newLine
+                        });
+                    }
+                }
+
+                return changes;
+            }
+
+            getCurrentVersion() {
+                return this.versions[this.currentIndex] || null;
+            }
+
+            getVersionByIndex(index) {
+                return this.versions[index] || null;
+            }
+
+            getAllVersions() {
+                return this.versions;
+            }
+
+            updateVersionDisplay() {
+                // Update the iteration counter
+                const counter = document.getElementById('system-iteration-counter');
+                if (counter && this.versions.length > 0) {
+                    const current = this.getCurrentVersion();
+                    counter.textContent = `Version ${this.versions.length} (Iteration ${current.iteration})`;
+                }
+
+                // Update code tabs with version info
+                this.updateCodeTabsWithVersions();
+            }
+
+            updateCodeTabsWithVersions() {
+                // Update tab labels to show version info
+                const originalTab = document.getElementById('system-tab-original');
+                const currentTab = document.getElementById('system-tab-current');
+                const diffTab = document.getElementById('system-tab-diff');
+
+                if (originalTab && this.versions.length > 0) {
+                    originalTab.textContent = `📄 Original (v1)`;
+                }
+
+                if (currentTab && this.versions.length > 1) {
+                    currentTab.textContent = `🔧 Current (v${this.versions.length})`;
+                }
+
+                if (diffTab && this.versions.length > 1) {
+                    const changesCount = this.getCurrentVersion().changes.length;
+                    diffTab.textContent = `🔍 Changes (${changesCount})`;
+                }
+            }
+
+            showVersionHistory() {
+                // Display version history in AI log
+                if (this.versions.length === 0) {
+                    addSystemAIMessage('📝 **No code versions available** - Execute code to start tracking versions.');
+                    return;
+                }
+
+                addSystemAIMessage(`📚 **Code Version History** - ${this.versions.length} versions tracked:`);
+
+                this.versions.forEach((version, index) => {
+                    const statusIcon = this.getStatusIcon(version.status);
+                    const changesText = version.changes.length > 0 ? ` (${version.changes.length} changes)` : '';
+                    const timeText = new Date(version.timestamp).toLocaleTimeString();
+
+                    addSystemAIMessage(`${statusIcon} **Version ${index + 1}**: ${version.description || version.status}${changesText} - ${timeText}`);
+                });
+            }
+
+            getStatusIcon(status) {
+                const icons = {
+                    'original': '📄',
+                    'modified': '🔧',
+                    'fixed': '🔨',
+                    'final': '✅',
+                    'error': '❌'
+                };
+                return icons[status] || '📝';
+            }
+
+            generateDetailedDiff(version1Index, version2Index) {
+                // Generate detailed diff between two versions
+                const v1 = this.getVersionByIndex(version1Index);
+                const v2 = this.getVersionByIndex(version2Index);
+
+                if (!v1 || !v2) return 'Invalid version indices';
+
+                const changes = this.calculateChanges(v1.code, v2.code);
+                let diffHTML = '';
+
+                if (changes.length === 0) {
+                    diffHTML = '<div style="color: #6c757d; font-style: italic;">No changes between versions</div>';
+                } else {
+                    diffHTML = `<div style="font-weight: bold; margin-bottom: 10px;">Changes from Version ${version1Index + 1} to Version ${version2Index + 1}:</div>`;
+
+                    changes.forEach(change => {
+                        let changeHTML = '';
+                        if (change.type === 'added') {
+                            changeHTML = `<div style="background: #e8f5e8; color: #2e7d32; padding: 2px 5px; border-left: 3px solid #4caf50;">+ Line ${change.lineNumber}: ${change.newLine}</div>`;
+                        } else if (change.type === 'deleted') {
+                            changeHTML = `<div style="background: #ffebee; color: #c62828; padding: 2px 5px; border-left: 3px solid #f44336;">- Line ${change.lineNumber}: ${change.oldLine}</div>`;
+                        } else if (change.type === 'modified') {
+                            changeHTML = `
+                                <div style="background: #ffebee; color: #c62828; padding: 2px 5px; border-left: 3px solid #f44336;">- Line ${change.lineNumber}: ${change.oldLine}</div>
+                                <div style="background: #e8f5e8; color: #2e7d32; padding: 2px 5px; border-left: 3px solid #4caf50;">+ Line ${change.lineNumber}: ${change.newLine}</div>
+                            `;
+                        }
+                        diffHTML += changeHTML;
+                    });
+                }
+
+                return diffHTML;
+            }
+        }
+
+        // Initialize global code version manager
+        window.codeVersionManager = new CodeVersionManager();
+
+        function toggleExecutionMode() {
+            const oldSystem = document.getElementById('execution-status-bar');
+            const newSystem = document.getElementById('integrated-execution-system');
+            const toggleBtn = document.getElementById('execution-mode-toggle');
+
+            const isIntegratedMode = newSystem.style.display !== 'none';
+
+            if (isIntegratedMode) {
+                // Switch to classic mode
+                newSystem.style.display = 'none';
+                oldSystem.style.display = 'block';
+                toggleBtn.textContent = '📊 Classic Mode';
+                toggleBtn.style.background = 'linear-gradient(135deg, #6c757d 0%, #495057 100%)';
+                window.integratedExecutionSystem.isActive = false;
+            } else {
+                // Switch to integrated mode
+                oldSystem.style.display = 'none';
+                newSystem.style.display = 'block';
+                toggleBtn.textContent = '🧪 Integrated System';
+                toggleBtn.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+                window.integratedExecutionSystem.isActive = true;
+
+                // Initialize the system
+                initializeIntegratedSystem();
+            }
+        }
+
+        function initializeIntegratedSystem() {
+            const rCode = window.currentRCode;
+            if (!rCode) {
+                addSystemAIMessage('⚠️ **No R code available.** Please generate R code in Step 3 first.');
+                return;
+            }
+
+            // Initialize system state
+            const system = window.integratedExecutionSystem;
+            system.originalCode = rCode;
+            system.currentCode = rCode;
+            system.currentIteration = 0;
+            system.executionLog = [];
+            system.aiMessages = [];
+            system.filesGenerated = [];
+
+            // NEW: Initialize code version tracking
+            window.codeVersionManager = new CodeVersionManager();
+            window.codeVersionManager.addVersion(rCode, 0, 'original', 'Initial R code from Step 3');
+
+            // Display code in all tabs
+            document.getElementById('system-code-original').textContent = rCode;
+            document.getElementById('system-code-current').textContent = rCode;
+            document.getElementById('system-code-diff').textContent = 'No changes yet - original code loaded';
+
+            // Update system status
+            updateSystemStatus('🟡 Ready', 'READY', 'READY');
+            updateSystemProgress(0, '0s', 0);
+
+            // Add initial AI message
+            addSystemAIMessage('🚀 **System Initialized** - R code loaded and ready for execution. The integrated system will provide transparent, step-by-step execution with real-time feedback.');
+            addSystemAIMessage('📝 **Version Tracking** - Code version 1 created. All changes will be tracked and displayed.');
+
+            // Add system log entry
+            addSystemLogEntry('System initialized with R code (' + rCode.length + ' characters)', '#569cd6');
+            addSystemLogEntry('Code version tracking enabled', '#4ec9b0');
+            addSystemLogEntry('Ready for execution...', '#6a9955');
+        }
+
+        function startSystemExecution() {
+            const system = window.integratedExecutionSystem;
+            const rCode = system.currentCode;
+
+            if (!rCode) {
+                addSystemAIMessage('❌ **No R code to execute.** Please load R code first.');
+                return;
+            }
+
+            // Prevent conflicts with main execution system
+            console.log('🔧 Integrated system taking control of execution');
+
+            // Update system state
+            system.isRunning = true;
+            system.startTime = Date.now();
+            system.currentIteration = 1;
+
+            // Update UI
+            updateSystemStatus('🟢 Running', 'EXECUTING', 'ANALYZING');
+            updateSystemControls('running');
+            updateSystemProgress(10, '0s', 0);
+
+            // Add messages
+            addSystemAIMessage(`🚀 **Starting Execution** - Beginning iteration 1/3. I'll monitor the process and provide real-time feedback.`);
+            addSystemLogEntry('Starting R code execution...', '#4ec9b0');
+            addSystemLogEntry('Iteration 1/3 - Attempting execution', '#d7ba7d');
+
+            // Execute the code
+            executeSystemRCode();
+        }
+
+        function executeSystemRCode() {
+            const system = window.integratedExecutionSystem;
+
+            addSystemAIMessage(`🔄 **Iteration ${system.currentIteration}** - Executing R code with Jupyter integration and function calling...`);
+            addSystemLogEntry(`Executing R code (iteration ${system.currentIteration})...`, '#569cd6');
+
+            // Prepare execution data with Jupyter mode
+            const executionData = {
+                r_code: system.currentCode,
+                max_iterations: 1, // Execute one iteration at a time for transparency
+                verbose: true,
+                system_mode: true,
+                iteration_number: system.currentIteration,
+                execution_mode: 'jupyter' // NEW: Enable Jupyter execution
+            };
+
+            // Include dataset info if available
+            if (window.datasetExplorationResult && window.datasetExplorationResult.dataset_info) {
+                executionData.dataset_path = window.currentDatasetPath;
+                executionData.dataset_info = window.datasetExplorationResult.dataset_info;
+                executionData.variables = Object.keys(window.datasetExplorationResult.dataset_info.variables || {});
+            }
+
+            // Update progress
+            updateSystemProgress(30, getSystemElapsedTime(), 0);
+
+            addSystemLogEntry('Using Jupyter-based execution with function calling...', '#4ec9b0');
+
+            // Execute R code with Jupyter integration
+            fetch('/execute_rcode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(executionData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // NEW: Track code versions if code was modified
+                if (data.final_code && data.final_code !== system.currentCode) {
+                    const iteration = system.currentIteration;
+                    const status = data.success ? 'fixed' : 'modified';
+                    const description = data.success ?
+                        `Successfully fixed code in iteration ${iteration}` :
+                        `Code modified in iteration ${iteration}`;
+
+                    window.codeVersionManager.addVersion(data.final_code, iteration, status, description);
+
+                    // Update system state
+                    system.currentCode = data.final_code;
+                    document.getElementById('system-code-current').textContent = data.final_code;
+
+                    // Show diff
+                    showSystemCodeDiff(system.originalCode, data.final_code);
+
+                    addSystemAIMessage(`📝 **Code Version ${window.codeVersionManager.versions.length}** - Code was modified during execution. Check the "Current" tab to see changes.`);
+                }
+
+                handleSystemExecutionResult(data);
+            })
+            .catch(error => {
+                addSystemAIMessage(`❌ **Execution Error**: ${error.message}`);
+                addSystemLogEntry(`ERROR: ${error.message}`, '#e74c3c');
+                console.error('System execution error:', error);
+                stopSystemExecution();
+            });
+        }
+
+        function handleSystemExecutionResult(data) {
+            const system = window.integratedExecutionSystem;
+            const elapsedTime = getSystemElapsedTime();
+
+            if (data.success) {
+                // Success!
+                addSystemAIMessage(`✅ **Success!** R code executed successfully on iteration ${system.currentIteration}.`);
+                addSystemLogEntry('R code execution completed successfully', '#27ae60');
+
+                // Check for warnings about output quality
+                if (data.warnings && data.warnings.length > 0) {
+                    addSystemAIMessage(`⚠️ **Quality Warnings**: ${data.warnings.join(', ')}`);
+                    addSystemLogEntry(`Warnings: ${data.warnings.join(', ')}`, '#ffc107');
+
+                    // Add specific guidance for HTML file issues
+                    if (data.warnings.some(w => w.includes('HTML') || w.includes('output quality'))) {
+                        addSystemAIMessage(`💡 **Note**: R code executed successfully but output format may differ from expected. Check generated files below.`);
+                    }
+                }
+
+                if (data.files_generated && data.files_generated.length > 0) {
+                    system.filesGenerated = data.files_generated;
+                    addSystemAIMessage(`📁 **Files Generated**: ${data.files_generated.length} output files created: ${data.files_generated.join(', ')}`);
+                    addSystemLogEntry(`Generated ${data.files_generated.length} output files`, '#27ae60');
+                    updateSystemProgress(100, elapsedTime, data.files_generated.length);
+                    // REMOVED: updateSystemResultsPreview() call - function deleted
+                }
+
+                // Show results in the main results area
+                displayExecutionResults(data);
+
+                // Update system status
+                updateSystemStatus('🟢 Complete', 'SUCCESS', 'COMPLETE');
+                updateSystemControls('completed');
+
+                addSystemLogEntry('Execution completed successfully', '#27ae60');
+
+            } else {
+                // Execution failed
+                const errorMsg = data.error || 'Unknown error';
+                addSystemAIMessage(`❌ **Iteration ${system.currentIteration} Failed**: ${errorMsg}`);
+                addSystemLogEntry(`ERROR: ${errorMsg}`, '#e74c3c');
+
+                if (system.currentIteration >= system.maxIterations) {
+                    addSystemAIMessage(`⚠️ **Maximum iterations reached**. Execution failed after ${system.maxIterations} attempts.`);
+                    updateSystemStatus('🔴 Failed', 'FAILED', 'ERROR');
+                    updateSystemControls('failed');
+                } else {
+                    // Try to get AI help for debugging
+                    addSystemAIMessage(`🤔 **Analyzing Error** - Let me examine the issue and suggest a fix...`);
+                    getSystemAIDebugging(errorMsg);
+                }
+            }
+        }
+
+        function getSystemAIDebugging(errorMsg) {
+            const system = window.integratedExecutionSystem;
+
+            addSystemLogEntry('Requesting AI debugging assistance...', '#f39c12');
+            updateSystemProgress(50, getSystemElapsedTime(), 0);
+
+            const debugData = {
+                r_code: system.currentCode,
+                error_message: errorMsg,
+                iteration: system.currentIteration,
+                execution_history: system.executionLog,
+                dataset_info: window.datasetExplorationResult?.dataset_info || {}
+            };
+
+            fetch('/debug_code_interactive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(debugData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.fixed_code) {
+                    const fixedCode = data.fixed_code;
+                    const explanation = data.explanation || 'Code has been updated to fix the issue.';
+
+                    addSystemAIMessage(`🔧 **AI Analysis**: ${explanation}`);
+                    addSystemLogEntry('AI provided code fix', '#f39c12');
+
+                    // Update current code
+                    system.currentCode = fixedCode;
+                    document.getElementById('system-code-current').textContent = fixedCode;
+
+                    // Show diff
+                    showSystemCodeDiff(system.originalCode, fixedCode);
+
+                    // Switch to current tab to show the fix
+                    switchSystemCodeTab('current');
+
+                    addSystemAIMessage(`💡 **Code Updated**: I've modified the code to address the issue. Review the changes in the "Current" tab.`);
+
+                    // Continue execution with fixed code
+                    system.currentIteration++;
+                    updateSystemProgress(70, getSystemElapsedTime(), 0);
+                    setTimeout(() => executeSystemRCode(), 2000); // Brief pause to show the fix
+
+                } else {
+                    addSystemAIMessage(`❌ **AI Debug Failed**: Unable to automatically fix the issue.`);
+                    addSystemLogEntry('AI debugging failed', '#e74c3c');
+                    updateSystemStatus('🔴 Failed', 'FAILED', 'ERROR');
+                    updateSystemControls('failed');
+                }
+            })
+            .catch(error => {
+                addSystemAIMessage(`❌ **AI Communication Error**: ${error.message}`);
+                addSystemLogEntry(`AI communication error: ${error.message}`, '#e74c3c');
+                updateSystemControls('failed');
+            });
+        }
+
+        function showSystemCodeDiff(oldCode, newCode) {
+            const diffElement = document.getElementById('system-code-diff');
+
+            // NEW: Use version manager for enhanced diff
+            if (window.codeVersionManager && window.codeVersionManager.versions.length > 1) {
+                const versions = window.codeVersionManager.getAllVersions();
+                const latestVersion = versions[versions.length - 1];
+                const originalVersion = versions[0];
+
+                // Show detailed diff with version info
+                let diffHTML = `
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #e9ecef;">
+                        <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">📊 Version Comparison</div>
+                        <div style="font-size: 12px; color: #6c757d;">
+                            Original (v1) → Current (v${versions.length}) | ${latestVersion.changes.length} changes
+                        </div>
+                    </div>
+                `;
+
+                diffHTML += window.codeVersionManager.generateDetailedDiff(0, versions.length - 1);
+                diffElement.innerHTML = diffHTML;
+            } else {
+                // Fallback to simple diff
+                const oldLines = oldCode.split('\n');
+                const newLines = newCode.split('\n');
+
+                let diffHTML = '';
+                const maxLines = Math.max(oldLines.length, newLines.length);
+
+                for (let i = 0; i < maxLines; i++) {
+                    const oldLine = oldLines[i] || '';
+                    const newLine = newLines[i] || '';
+
+                    if (oldLine !== newLine) {
+                        if (oldLine) {
+                            diffHTML += `<div style="background: #ffebee; color: #c62828; padding: 2px 5px; border-left: 3px solid #f44336;">- ${oldLine}</div>`;
+                        }
+                        if (newLine) {
+                            diffHTML += `<div style="background: #e8f5e8; color: #2e7d32; padding: 2px 5px; border-left: 3px solid #4caf50;">+ ${newLine}</div>`;
+                        }
+                    } else if (oldLine) {
+                        diffHTML += `<div style="padding: 2px 5px; color: #666;">${oldLine}</div>`;
+                    }
+                }
+
+                diffElement.innerHTML = diffHTML;
+            }
+        }
+
+        function switchSystemCodeTab(tab) {
+            // Update tab buttons
+            document.getElementById('system-tab-original').style.background = tab === 'original' ? '#007bff' : '#6c757d';
+            document.getElementById('system-tab-current').style.background = tab === 'current' ? '#007bff' : '#6c757d';
+            document.getElementById('system-tab-diff').style.background = tab === 'diff' ? '#007bff' : '#6c757d';
+
+            // Show/hide content
+            document.getElementById('system-code-original').style.display = tab === 'original' ? 'block' : 'none';
+            document.getElementById('system-code-current').style.display = tab === 'current' ? 'block' : 'none';
+            document.getElementById('system-code-diff').style.display = tab === 'diff' ? 'block' : 'none';
+        }
+
+        function updateSystemStatus(status, codeStatus, aiStatus) {
+            document.getElementById('system-status').textContent = status;
+            document.getElementById('code-status').textContent = codeStatus;
+            document.getElementById('ai-status-indicator-system').textContent = aiStatus;
+            document.getElementById('system-iteration-counter').textContent = `Iteration ${window.integratedExecutionSystem.currentIteration}/3`;
+        }
+
+        function updateSystemProgressAdvanced(percentage, time, files) {
+            const progressBar = document.getElementById('system-execution-progress');
+            const progressText = document.getElementById('system-progress-text');
+            const timeElement = document.getElementById('system-execution-time');
+            const filesElement = document.getElementById('system-files-count');
+
+            if (progressBar) progressBar.style.width = `${percentage}%`;
+            if (progressText) progressText.textContent = `${percentage}%`;
+            if (timeElement) timeElement.textContent = time;
+            if (filesElement) filesElement.textContent = files;
+        }
+
+        function updateSystemControls(state) {
+            const startBtn = document.getElementById('system-start-btn');
+            const pauseBtn = document.getElementById('system-pause-btn');
+            const stopBtn = document.getElementById('system-stop-btn');
+
+            switch(state) {
+                case 'running':
+                    startBtn.style.display = 'none';
+                    pauseBtn.style.display = 'inline-block';
+                    stopBtn.style.display = 'inline-block';
+                    break;
+                case 'paused':
+                    startBtn.textContent = '▶️ Resume';
+                    startBtn.style.display = 'inline-block';
+                    pauseBtn.style.display = 'none';
+                    stopBtn.style.display = 'inline-block';
+                    break;
+                case 'completed':
+                case 'failed':
+                    startBtn.textContent = '🚀 Execute';
+                    startBtn.style.display = 'inline-block';
+                    pauseBtn.style.display = 'none';
+                    stopBtn.style.display = 'none';
+                    window.integratedExecutionSystem.isRunning = false;
+                    break;
+            }
+        }
+
+        function addSystemAIMessage(message) {
+            const aiLog = document.getElementById('system-ai-log');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'system-ai-message';
+            messageDiv.style.cssText = 'margin-bottom: 12px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #6f42c1;';
+
+            const timestamp = new Date().toLocaleTimeString();
+            messageDiv.innerHTML = `
+                <div style="font-weight: bold; color: #6f42c1; margin-bottom: 5px; font-size: 11px;">🤖 AI Assistant - ${timestamp}</div>
+                <div style="font-size: 12px; color: #495057; line-height: 1.4;">${message}</div>
+            `;
+
+            aiLog.appendChild(messageDiv);
+            aiLog.scrollTop = aiLog.scrollHeight;
+
+            // Store in system messages
+            window.integratedExecutionSystem.aiMessages.push({
+                timestamp: new Date().toISOString(),
+                message: message
+            });
+        }
+
+        // Duplicate function removed - using the main addSystemLogEntry function
+
+        // REMOVED: updateSystemResultsPreview() - targets non-existent UI elements, not used by actual UI
+
+        function getSystemElapsedTime() {
+            if (!window.integratedExecutionSystem.startTime) return '0s';
+            const elapsed = (Date.now() - window.integratedExecutionSystem.startTime) / 1000;
+            return `${elapsed.toFixed(1)}s`;
+        }
+
+        function pauseSystemExecution() {
+            window.integratedExecutionSystem.isRunning = false;
+            updateSystemStatus('🟡 Paused', 'PAUSED', 'WAITING');
+            updateSystemControls('paused');
+            addSystemAIMessage('⏸️ **Execution Paused** - You can resume anytime or make changes to the code.');
+            addSystemLogEntry('Execution paused by user', '#ffc107');
+        }
+
+        function stopSystemExecution() {
+            window.integratedExecutionSystem.isRunning = false;
+            updateSystemStatus('🔴 Stopped', 'STOPPED', 'IDLE');
+            updateSystemControls('completed');
+            addSystemAIMessage('⏹️ **Execution Stopped** - You can start a new execution anytime.');
+            addSystemLogEntry('Execution stopped by user', '#dc3545');
+        }
+
+        function editSystemCode() {
+            const currentCode = window.integratedExecutionSystem.currentCode;
+            const newCode = prompt('Edit the R code:', currentCode);
+
+            if (newCode && newCode !== currentCode) {
+                window.integratedExecutionSystem.currentCode = newCode;
+                document.getElementById('system-code-current').textContent = newCode;
+                showSystemCodeDiff(window.integratedExecutionSystem.originalCode, newCode);
+                addSystemAIMessage('✏️ **Code Manually Edited** - The code has been updated. You can now execute the modified version.');
+                addSystemLogEntry('Code manually edited by user', '#17a2b8');
+                switchSystemCodeTab('current');
+            }
+        }
+
+        function resetSystemCode() {
+            const system = window.integratedExecutionSystem;
+            system.currentCode = system.originalCode;
+            document.getElementById('system-code-current').textContent = system.originalCode;
+            document.getElementById('system-code-diff').textContent = 'Code reset to original version';
+            addSystemAIMessage('🔄 **Code Reset** - The code has been restored to its original version.');
+            addSystemLogEntry('Code reset to original version', '#6c757d');
+            switchSystemCodeTab('original');
+        }
+
+        function validateSystemCode() {
+            const code = window.integratedExecutionSystem.currentCode;
+            if (!code || code.trim().length === 0) {
+                addSystemAIMessage('❌ **Validation Failed** - No code to validate.');
+                return;
+            }
+
+            addSystemLogEntry('🔍 Validating code with AI...', '#17a2b8');
+
+            // Use LLM backend for intelligent validation
+            fetch('/validate_r_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    r_code: code,
+                    context: 'system_validation',
+                    dataset_info: window.currentDatasetInfo || {}
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.validation) {
+                    const validation = data.validation;
+                    if (validation.score >= 70) {
+                        addSystemAIMessage(`✅ **AI Validation Passed** - Code looks good (${validation.score}% confidence). Ready for execution.`);
+                        addSystemLogEntry(`AI validation passed (${validation.score}%)`, '#28a745');
+                    } else {
+                        const issues = validation.issues ? validation.issues.join(', ') : 'Various issues detected';
+                        addSystemAIMessage(`⚠️ **AI Validation Warning** - Code may have issues (${validation.score}% confidence): ${issues}`);
+                        addSystemLogEntry(`AI validation warning (${validation.score}%)`, '#ffc107');
+                    }
+                } else {
+                    addSystemAIMessage('❌ **Validation Error** - Unable to validate code: ' + (data.error || 'Unknown error'));
+                    addSystemLogEntry('Validation error', '#dc3545');
+                }
+            })
+            .catch(error => {
+                console.error('System validation error:', error);
+                addSystemAIMessage('❌ **Validation Error** - Unable to connect to validation service.');
+                addSystemLogEntry('Validation connection error', '#dc3545');
+            });
+        }
+
+        // Duplicate sendAIMessage function removed - using real LLM version below
+
+        function showVersionHistory() {
+            // Show code version history
+            if (window.codeVersionManager) {
+                window.codeVersionManager.showVersionHistory();
+            } else {
+                addSystemAIMessage('📝 **No version history available** - Version tracking not initialized.');
+            }
+        }
+
+        // ========================================
+        // PRIORITY 2: Function Call UI Integration
+        // ========================================
+
+        function displayFunctionCallResults(function_calls) {
+            // Display function call results in the UI panels
+            if (!function_calls || function_calls.length === 0) {
+                return;
+            }
+
+            // Add function call section to AI log
+            addSystemAIMessage('🔧 **Function Calls Executed** - The AI assistant used interactive exploration to understand the problem:');
+
+            function_calls.forEach((call, index) => {
+                const callName = call.name || call.function_name || 'unknown_function';
+                const callResult = call.result || call.output || 'No result';
+                const callArgs = call.args || call.arguments || {};
+
+                // Display function call in AI panel
+                addFunctionCallToAILog(callName, callArgs, callResult, index + 1);
+
+                // Display function call in execution log
+                addFunctionCallToExecutionLog(callName, callArgs, callResult);
+
+                // Update code panel if function call affects code
+                if (callName === 'execute_r_code' && call.result && call.result.success) {
+                    updateCodePanelWithFunctionResult(call);
+                }
+            });
+        }
+
+        function addFunctionCallToAILog(functionName, args, result, callNumber) {
+            // Add function call details to AI communication log
+            const aiLog = document.getElementById('system-ai-log') || document.getElementById('ai-communication-log');
+            if (!aiLog) return;
+
+            const functionCallDiv = document.createElement('div');
+            functionCallDiv.className = 'function-call-result';
+            functionCallDiv.style.cssText = 'margin-bottom: 15px; padding: 12px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;';
+
+            const argsDisplay = Object.keys(args).length > 0 ?
+                `<div style="font-size: 11px; color: #666; margin: 5px 0;"><strong>Args:</strong> ${JSON.stringify(args)}</div>` : '';
+
+            functionCallDiv.innerHTML = `
+                <div style="font-weight: bold; color: #1976d2; margin-bottom: 5px; font-size: 12px;">
+                    🔧 Function Call ${callNumber}: ${functionName}()
+                </div>
+                ${argsDisplay}
+                <div style="font-size: 12px; color: #495057; background: white; padding: 8px; border-radius: 4px; font-family: 'Courier New', monospace; white-space: pre-wrap; max-height: 150px; overflow-y: auto;">
+                    ${result}
+                </div>
+            `;
+
+            aiLog.appendChild(functionCallDiv);
+            aiLog.scrollTop = aiLog.scrollHeight;
+        }
+
+        function addFunctionCallToExecutionLog(functionName, args, result) {
+            // Add function call to execution log
+            const logElement = document.getElementById('system-execution-log');
+            if (!logElement) return;
+
+            const timestamp = new Date().toLocaleTimeString();
+
+            // Function call header
+            const headerLine = document.createElement('div');
+            headerLine.style.color = '#4ec9b0';
+            headerLine.textContent = `[${timestamp}] 🔧 Function Call: ${functionName}()`;
+            logElement.appendChild(headerLine);
+
+            // Function result (truncated for log)
+            const resultLine = document.createElement('div');
+            resultLine.style.color = '#d4d4d4';
+            const truncatedResult = result.length > 100 ? result.substring(0, 100) + '...' : result;
+            resultLine.textContent = `[${timestamp}] Result: ${truncatedResult}`;
+            logElement.appendChild(resultLine);
+
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateCodePanelWithFunctionResult(functionCall) {
+            // Update code panel when function call affects code
+            if (functionCall.name === 'execute_r_code' && functionCall.result) {
+                const newCode = functionCall.args.code || functionCall.arguments.code;
+                if (newCode && window.integratedExecutionSystem) {
+                    // Update current code
+                    window.integratedExecutionSystem.currentCode = newCode;
+                    document.getElementById('system-code-current').textContent = newCode;
+
+                    // Show diff
+                    showSystemCodeDiff(window.integratedExecutionSystem.originalCode, newCode);
+
+                    // Switch to current tab
+                    switchSystemCodeTab('current');
+
+                    addSystemAIMessage('🔧 **Code Updated** - Function call resulted in code modification. Check the "Current" tab to see changes.');
+                }
+            }
+        }
+
+        function displayJupyterExecutionResults(executionResult) {
+            // Display Jupyter execution results with enhanced information
+            if (!executionResult) return;
+
+            // Show execution method
+            const method = executionResult.execution_method || 'unknown';
+            addSystemAIMessage(`⚡ **Execution Method**: ${method}`);
+
+            // Show session state if available
+            if (executionResult.session_state) {
+                const sessionInfo = Object.keys(executionResult.session_state).length;
+                addSystemAIMessage(`📊 **Session State**: ${sessionInfo} variables in R session`);
+            }
+
+            // Show variables cache if available
+            if (executionResult.variables_cache) {
+                const variables = Object.keys(executionResult.variables_cache);
+                if (variables.length > 0) {
+                    addSystemAIMessage(`📋 **Variables Available**: ${variables.slice(0, 5).join(', ')}${variables.length > 5 ? '...' : ''}`);
+                }
+            }
+
+            // Show function calls if used
+            if (executionResult.function_calls_used && executionResult.function_calls_used.length > 0) {
+                addSystemAIMessage(`🔧 **Function Calls Used**: ${executionResult.function_calls_used.length} interactive exploration functions`);
+                displayFunctionCallResults(executionResult.function_calls_used);
+            }
+
+            // Show debug iterations if available
+            if (executionResult.debug_iterations && executionResult.debug_iterations.length > 0) {
+                addSystemAIMessage(`🔄 **Debug Iterations**: ${executionResult.debug_iterations.length} debugging attempts`);
+
+                executionResult.debug_iterations.forEach((iteration, index) => {
+                    addSystemAIMessage(`📝 **Iteration ${index + 1}**: ${iteration.summary || 'Debug attempt'}`);
+
+                    if (iteration.function_calls) {
+                        displayFunctionCallResults(iteration.function_calls);
+                    }
+                });
+            }
+
+            // Show final code if different from original
+            if (executionResult.final_code && executionResult.final_code !== window.currentRCode) {
+                addSystemAIMessage('🔧 **Code was modified during execution** - Check the "Current" tab to see the final version.');
+
+                if (window.integratedExecutionSystem) {
+                    window.integratedExecutionSystem.currentCode = executionResult.final_code;
+                    document.getElementById('system-code-current').textContent = executionResult.final_code;
+                    showSystemCodeDiff(window.integratedExecutionSystem.originalCode, executionResult.final_code);
+                }
+            }
+
+            // Display standard execution results
+            displayExecutionResults(executionResult);
+        }
+
+        // Update the existing executeSystemRCode function to handle Jupyter results
+        function handleSystemExecutionResult(data) {
+            const system = window.integratedExecutionSystem;
+            const elapsedTime = getSystemElapsedTime();
+
+            if (data.success) {
+                // Success!
+                addSystemAIMessage(`✅ **Success!** R code executed successfully using ${data.execution_method || 'default'} method.`);
+                addSystemLogEntry('R code execution completed successfully', '#27ae60');
+
+                // Handle Jupyter-specific results
+                if (data.execution_method && data.execution_method.includes('jupyter')) {
+                    displayJupyterExecutionResults(data);
+                } else {
+                    // Handle standard results
+                    if (data.files_generated && data.files_generated.length > 0) {
+                        system.filesGenerated = data.files_generated;
+                        addSystemAIMessage(`📁 **Files Generated**: ${data.files_generated.length} output files created`);
+                        addSystemLogEntry(`Generated ${data.files_generated.length} output files`, '#27ae60');
+                        updateSystemProgress(100, elapsedTime, data.files_generated.length);
+                        // REMOVED: updateSystemResultsPreview() call - function deleted
+                    }
+
+                    displayExecutionResults(data);
+                }
+
+                // Update system status
+                updateSystemStatus('🟢 Complete', 'SUCCESS', 'COMPLETE');
+                updateSystemControls('completed');
+                addSystemLogEntry('Execution completed successfully', '#27ae60');
+
+            } else {
+                // Execution failed
+                const errorMsg = data.error || 'Unknown error';
+                addSystemAIMessage(`❌ **Execution Failed**: ${errorMsg}`);
+                addSystemLogEntry(`ERROR: ${errorMsg}`, '#e74c3c');
+
+                // Show debug attempts if available
+                if (data.debug_attempts && data.debug_attempts.length > 0) {
+                    addSystemAIMessage(`🔧 **Debug Attempts**: ${data.debug_attempts.length} debugging iterations attempted`);
+                }
+
+                // Show function calls attempted if available
+                if (data.function_calls_attempted && data.function_calls_attempted.length > 0) {
+                    addSystemAIMessage(`🔧 **Function Calls Attempted**: ${data.function_calls_attempted.length} exploration functions used`);
+                    displayFunctionCallResults(data.function_calls_attempted);
+                }
+
+                updateSystemStatus('🔴 Failed', 'FAILED', 'ERROR');
+                updateSystemControls('failed');
+            }
+        }
+
+        // ===== AI ASSISTANT FUNCTIONS =====
+
+        function explainCode() {
+            console.log('📖 Explaining R code');
+
+            const editor = document.getElementById('step4-rcode-editor');
+            if (!editor) return;
+
+            const code = editor.value.trim();
+            if (!code) {
+                addAIMessage('❌ **No code to explain** - Please enter R code in the editor first.');
+                return;
+            }
+
+            // Add user message
+            addAIMessage('📖 **Code Explanation Request** - Please explain what this R code does.', 'user');
+
+            // Show typing indicator
+            addAIMessage('🤖 Analyzing code...', 'ai-typing');
+
+            // Send to real LLM backend for code explanation
+            const requestData = {
+                message: `Please explain this R code in detail: ${code}`,
+                r_code: code,
+                execution_history: [],
+                context: 'Code explanation request for clinical R code'
+            };
+
+            fetch('/api/step4/interactive/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Analyzing code...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                if (data.success) {
+                    addAIMessage(data.response);
+                } else {
+                    addAIMessage('❌ **Error**: Unable to explain code. Please try again.');
+                }
+            })
+            .catch(error => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Analyzing code...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                console.error('Code explanation error:', error);
+                addAIMessage('❌ **Connection Error**: Unable to reach AI for code explanation.');
+            });
+        }
+
+        function getAIHelp() {
+            console.log('🆘 Getting AI help');
+
+            // Add user message
+            addAIMessage('🆘 **Help Request** - What assistance can you provide for R code execution and clinical analysis?', 'user');
+
+            // Show typing indicator
+            addAIMessage('🤖 Preparing help information...', 'ai-typing');
+
+            // Send to real LLM backend for help information
+            const requestData = {
+                message: 'What assistance can you provide for R code execution, debugging, and clinical data analysis? Please list your capabilities.',
+                r_code: window.currentRCode || '',
+                execution_history: [],
+                context: 'Help request for AI assistant capabilities'
+            };
+
+            fetch('/api/step4/interactive/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Preparing help information...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                if (data.success) {
+                    addAIMessage(data.response);
+                } else {
+                    addAIMessage('❌ **Error**: Unable to get help information. Please try again.');
+                }
+            })
+            .catch(error => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Preparing help information...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                console.error('AI help error:', error);
+                addAIMessage('❌ **Connection Error**: Unable to reach AI for help information.');
+            });
+        }
+
+        function optimizeCode() {
+            console.log('⚡ Optimizing R code');
+
+            const editor = document.getElementById('step4-rcode-editor');
+            if (!editor) return;
+
+            const code = editor.value.trim();
+            if (!code) {
+                addAIMessage('❌ **No code to optimize** - Please enter R code in the editor first.');
+                return;
+            }
+
+            // Add user message
+            addAIMessage('⚡ **Code Optimization Request** - Please optimize my R code for better performance and readability.', 'user');
+
+            // Show typing indicator
+            addAIMessage('🤖 Analyzing code for optimization...', 'ai-typing');
+
+            // Send to real LLM backend for code optimization
+            const requestData = {
+                message: `Please analyze and optimize this R code for better performance, readability, and clinical analysis best practices: ${code}`,
+                r_code: code,
+                execution_history: [],
+                context: 'Code optimization request for clinical R code'
+            };
+
+            fetch('/api/step4/interactive/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Analyzing code for optimization...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                if (data.success) {
+                    addAIMessage(data.response);
+                } else {
+                    addAIMessage('❌ **Error**: Unable to optimize code. Please try again.');
+                }
+            })
+            .catch(error => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Analyzing code for optimization...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                console.error('Code optimization error:', error);
+                addAIMessage('❌ **Connection Error**: Unable to reach AI for code optimization.');
+            });
+        }
+
+        function sendAIMessage() {
+            console.log('💬 Sending AI message');
+
+            const input = document.getElementById('ai-chat-input');
+            if (!input) return;
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addAIMessage(message, 'user');
+
+            // Clear input
+            input.value = '';
+
+            // Show typing indicator
+            addAIMessage('🤖 Thinking...', 'ai-typing');
+
+            // Send message to real LLM backend
+            const requestData = {
+                message: message,
+                r_code: window.currentRCode || '',
+                execution_history: window.integratedExecutionSystem?.executionHistory || [],
+                context: `Step 4 - R Code Execution & AI Assistant. Dataset: ${window.currentDatasetPath || 'None'}`
+            };
+
+            fetch('/api/step4/interactive/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Thinking...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                if (data.success) {
+                    addAIMessage(data.response);
+                } else {
+                    addAIMessage('❌ **Error**: Sorry, I encountered an issue processing your message. Please try again.');
+                    console.error('AI chat error:', data.error);
+                }
+            })
+            .catch(error => {
+                // Remove typing indicator
+                const chatArea = document.getElementById('ai-chat-area');
+                const typingIndicator = chatArea.querySelector('.ai-message:last-child');
+                if (typingIndicator && typingIndicator.textContent.includes('Thinking...')) {
+                    chatArea.removeChild(typingIndicator);
+                }
+
+                console.error('AI chat request failed:', error);
+                addAIMessage('❌ **Connection Error**: Unable to reach AI assistant. Please check your connection and try again.');
+            });
+        }
+
+        // ===== INTERACTIVE AI SYSTEM =====
+        // Note: Global variables declared at top of file
+
+        function getDatasetInfoFromStep1() {
+            // Get dataset information from Step 1 analysis results
+            const datasetInfo = {
+                dataset_path: window.currentDatasetPath || '',
+                analysis_results: window.lastAnalysisResult || {},
+                exploration_results: window.datasetExplorationResult || {}
+            };
+
+            console.log('📊 Dataset info from Step 1:', datasetInfo);
+            return datasetInfo;
+        }
+
+        function initializeInteractiveSession() {
+            console.log('🚀 Initializing interactive AI session');
+
+            try {
+                updateSessionStatus('🟡 INITIALIZING', '#ffc107');
+
+                // Get dataset info from Step 1
+                const datasetInfo = getDatasetInfoFromStep1();
+                console.log('📊 Dataset info prepared:', datasetInfo);
+
+                const requestData = {
+                    dataset_info: datasetInfo,
+                    work_dir: './outputs/step4'
+                };
+                console.log('📡 Sending initialization request:', requestData);
+
+                fetch('/api/step4/interactive/initialize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => {
+                    console.log('📡 Initialization response received:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📊 Initialization data:', data);
+                    if (data.success) {
+                        interactiveSession = data.session_info;
+                        updateSessionStatus('🟢 READY', '#28a745');
+                        addInteractiveMessage('✅ Interactive R session initialized! Ready for analysis.', 'system');
+                        console.log('✅ Session initialized successfully');
+                    } else {
+                        updateSessionStatus('🔴 ERROR', '#dc3545');
+                        addInteractiveMessage(`❌ Failed to initialize: ${data.message}`, 'system');
+                        console.error('❌ Initialization failed:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Session initialization error:', error);
+                    updateSessionStatus('🔴 ERROR', '#dc3545');
+                    addInteractiveMessage('❌ Connection error during initialization', 'system');
+                });
+            } catch (error) {
+                console.error('❌ Initialization function error:', error);
+                updateSessionStatus('🔴 ERROR', '#dc3545');
+                addInteractiveMessage('❌ Initialization error', 'system');
+            }
+        }
+
+        // ===== STEP 4 FUNCTIONS MOVED TO step4-functions.js =====
+        // sendInteractiveMessage, sendQuickMessage, and related functions
+        // are now defined in app/ui/js/step4-functions.js for better organization
+
+        // sendInteractiveMessageWithText moved to step4-functions.js
+
+        // streamInteractiveResponse function moved to step4-functions.js
+        // HTML version completely removed to prevent conflicts
+
+
+
+        function updateSessionStatus(status, color) {
+            const indicator = document.getElementById('session-status-indicator');
+            if (indicator) {
+                indicator.textContent = status;
+                indicator.style.background = color;
+            }
+        }
+
+        function updateExecutionStatus(executing) {
+            const interruptBtn = document.getElementById('interrupt-btn');
+            if (interruptBtn) {
+                interruptBtn.style.display = executing ? 'block' : 'none';
+            }
+        }
+
+        function addInteractiveMessage(content, type) {
+            const chatArea = document.getElementById('ai-chat-area');
+            if (!chatArea) return;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${type}-message`;
+
+            let borderColor = '#6f42c1';
+            let icon = '🤖';
+            let title = 'AI Assistant';
+
+            if (type === 'user') {
+                borderColor = '#007bff';
+                icon = '👤';
+                title = 'You';
+            } else if (type === 'system') {
+                borderColor = '#28a745';
+                icon = '⚙️';
+                title = 'System';
+            }
+
+            messageDiv.style.cssText = `
+                margin-bottom: 12px;
+                padding: 10px;
+                background: white;
+                border-radius: 8px;
+                border-left: 4px solid ${borderColor};
+            `;
+
+            messageDiv.innerHTML = `
+                <div style="font-weight: bold; color: ${borderColor}; margin-bottom: 5px; font-size: 11px;">
+                    ${icon} ${title}
+                </div>
+                <div style="font-size: 12px; color: #495057; line-height: 1.4;">
+                    ${content}
+                </div>
+            `;
+
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function interruptExecution() {
+            if (window.interactiveSession && window.isExecuting) {
+                fetch('/api/step4/interactive/interrupt', { method: 'POST' })
+                .then(() => {
+                    addInteractiveMessage('🛑 Execution interrupted', 'system');
+                    window.isExecuting = false;
+                    updateExecutionStatus(false);
+                });
+            }
+        }
+
+        function restartSession() {
+            if (window.interactiveSession) {
+                updateSessionStatus('🟡 RESTARTING', '#ffc107');
+                fetch('/api/step4/interactive/restart', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.interactiveSession = data.session_info;
+                        updateSessionStatus('🟢 READY', '#28a745');
+                        addInteractiveMessage('🔄 Session restarted successfully (conversation history cleared)', 'system');
+                    } else {
+                        updateSessionStatus('🔴 ERROR', '#dc3545');
+                        addInteractiveMessage('❌ Failed to restart session', 'system');
+                    }
+                });
+            }
+        }
+
+        function continueSession() {
+            console.log('🔄 Continuing session...');
+
+            // Simple fix: just reset UI state to allow new input
+            window.isExecuting = false;
+            updateExecutionStatus(false);
+
+            // Re-enable input
+            const sendBtn = document.getElementById('send-message-btn');
+            const chatInput = document.getElementById('ai-chat-input');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '🚀 Send';
+            }
+            if (chatInput) {
+                chatInput.disabled = false;
+                chatInput.placeholder = 'Type your message...';
+            }
+
+            updateSessionStatus('🟢 READY', '#28a745');
+            addInteractiveMessage('🔄 Session continued (history preserved)', 'system');
+        }
+
+        // REFERENCE PROJECT STYLE: No automatic initialization
+        function initializeStep4Interactive() {
+            // LLM will decide when to initialize kernel based on user requests
+            console.log('🚀 Step 4 ready - LLM will decide when to use kernel');
+        }
+
+        function addAIMessage(message, type = 'ai') {
+            console.log('📝 Adding AI message:', message);
+
+            const chatArea = document.getElementById('ai-chat-area');
+            if (!chatArea) return;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'user' ? 'user-message' : 'ai-message';
+
+            if (type === 'user') {
+                messageDiv.style.cssText = 'margin-bottom: 12px; padding: 10px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;';
+                messageDiv.innerHTML = `
+                    <div style="font-weight: bold; color: #1976d2; margin-bottom: 5px; font-size: 11px;">👤 You</div>
+                    <div style="font-size: 12px; color: #495057; line-height: 1.4;">${message}</div>
+                `;
+            } else if (type === 'ai-typing') {
+                messageDiv.style.cssText = 'margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #6c757d;';
+                messageDiv.innerHTML = `
+                    <div style="font-weight: bold; color: #6c757d; margin-bottom: 5px; font-size: 11px;">🤖 AI Assistant</div>
+                    <div style="font-size: 12px; color: #6c757d; line-height: 1.4; font-style: italic;">${message}</div>
+                `;
+            } else {
+                messageDiv.style.cssText = 'margin-bottom: 12px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #6f42c1;';
+                messageDiv.innerHTML = `
+                    <div style="font-weight: bold; color: #6f42c1; margin-bottom: 5px; font-size: 11px;">🤖 AI Assistant</div>
+                    <div style="font-size: 12px; color: #495057; line-height: 1.4; white-space: pre-line;">${message}</div>
+                `;
+            }
+
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // ===== EXECUTION LOG & PROGRESS FUNCTIONS =====
+
+        function clearExecutionLog() {
+            console.log('🗑️ Clearing execution log');
+
+            const logElement = document.getElementById('execution-log-display');
+            if (logElement) {
+                logElement.innerHTML = `
+                    <div style="color: #569cd6;">🤖 R Code Execution System v2.0</div>
+                    <div style="color: #6a9955;">Ready for AI-powered R code execution with iterative debugging...</div>
+                    <div style="color: #4ec9b0;">Mode: <span id="execution-current-mode">AI-Powered Execution</span></div>
+                    <div style="margin: 10px 0; color: #d7ba7d;">
+                        <span style="color: #569cd6;">></span> <span id="execution-cursor" style="animation: blink 1s infinite;">_</span>
+                    </div>
+                `;
+            }
+
+            // Reset progress
+            updateExecutionProgress(0, 'Ready');
+            updateIterationCounter('Ready', '');
+        }
+
+        function addExecutionLogEntry(message, color = '#d4d4d4', timestamp = true) {
+            console.log('📝 Adding execution log entry:', message);
+
+            const logElement = document.getElementById('execution-log-display');
+            if (!logElement) return;
+
+            const timeStr = timestamp ? `[${new Date().toLocaleTimeString()}] ` : '';
+            const logEntry = document.createElement('div');
+            logEntry.style.color = color;
+            logEntry.style.marginBottom = '2px';
+            logEntry.textContent = `${timeStr}${message}`;
+
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateExecutionProgress(percentage, statusText) {
+            console.log('📊 Updating execution progress:', percentage, statusText);
+
+            const progressBar = document.getElementById('execution-progress-bar');
+            const progressText = document.getElementById('execution-progress-text');
+            const statusIndicator = document.getElementById('execution-status-indicator');
+
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+            }
+
+            if (progressText) {
+                progressText.textContent = percentage + '%';
+            }
+
+            if (statusIndicator && statusText) {
+                statusIndicator.textContent = statusText;
+
+                // Update color based on status
+                if (statusText.includes('Ready') || statusText.includes('IDLE')) {
+                    statusIndicator.style.background = '#ffc107';
+                    statusIndicator.style.color = '#212529';
+                } else if (statusText.includes('Running') || statusText.includes('Executing')) {
+                    statusIndicator.style.background = '#17a2b8';
+                    statusIndicator.style.color = 'white';
+                } else if (statusText.includes('Success') || statusText.includes('Complete')) {
+                    statusIndicator.style.background = '#28a745';
+                    statusIndicator.style.color = 'white';
+                } else if (statusText.includes('Error') || statusText.includes('Failed')) {
+                    statusIndicator.style.background = '#dc3545';
+                    statusIndicator.style.color = 'white';
+                }
+            }
+        }
+
+        function updateIterationCounter(current, total) {
+            console.log('🔄 Updating iteration counter:', current, total);
+
+            const counter = document.getElementById('iteration-counter');
+            const iterationDisplay = document.getElementById('execution-iteration-display');
+
+            if (counter) {
+                if (typeof current === 'string') {
+                    counter.textContent = current;
+                    counter.style.background = '#e9ecef';
+                    counter.style.color = '#6c757d';
+                } else {
+                    counter.textContent = `Iteration ${current}/${total}`;
+
+                    // Update color based on iteration
+                    if (current === 1) {
+                        counter.style.background = '#e9ecef';
+                        counter.style.color = '#6c757d';
+                    } else if (current === 2) {
+                        counter.style.background = '#fff3cd';
+                        counter.style.color = '#856404';
+                    } else {
+                        counter.style.background = '#f8d7da';
+                        counter.style.color = '#721c24';
+                    }
+                }
+            }
+
+            if (iterationDisplay && typeof current === 'number') {
+                iterationDisplay.textContent = `${current}/${total}`;
+            }
+        }
+
+        // REMOVED: updateExecutionStats() - duplicate function, kept version in step4-functions.js
+
+        function exportExecutionLog() {
+            console.log('📥 Exporting execution log');
+
+            const logElement = document.getElementById('execution-log-display');
+            if (!logElement) {
+                alert('No execution log to export');
+                return;
+            }
+
+            const logContent = logElement.textContent;
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `execution_log_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            addAIMessage('📥 **Execution log exported** - Downloaded as text file for your records.');
+        }
+
+
+
+        function completeExecution(data) {
+            console.log('✅ Completing execution tracking');
+            console.log('🔍 completeExecution received data:', {
+                success: data.success,
+                warnings: data.warnings,
+                error: data.error,
+                iterations_used: data.iterations_used,
+                files_generated: data.files_generated
+            });
+
+            const iterations = data.iterations_used || 1;
+            const executionTime = data.execution_time || 0;
+            const filesCount = data.files_generated ? data.files_generated.length : 0;
+
+            // Update final progress
+            updateExecutionProgress(100, 'Complete');
+            updateIterationCounter(iterations, 3);
+            updateExecutionStats(`${executionTime.toFixed(1)}s`, filesCount);
+
+            // Display comprehensive execution summary
+            displayComprehensiveExecutionSummary(data);
+
+            console.log('🔍 Checking data.success:', data.success, typeof data.success);
+            if (data.success) {
+                console.log('✅ SUCCESS path taken in completeExecution');
+                addExecutionLogEntry('✅ R code executed successfully!', '#27ae60');
+                addExecutionLogEntry(`🔄 Completed in ${iterations} iteration(s)`, '#3498db');
+                addExecutionLogEntry(`⏱️ Execution time: ${executionTime.toFixed(1)}s`, '#6a9955');
+                addExecutionLogEntry(`📁 Generated ${filesCount} output file(s)`, '#f39c12');
+
+                // Enhanced AI feedback with detailed information
+                displaySuccessfulExecutionFeedback(data, iterations, filesCount);
+
+                if (iterations > 1) {
+                    addAIMessage(`🔧 **AI debugging helped!** Fixed issues automatically in ${iterations} iterations.`);
+                }
+            } else {
+                console.log('❌ FAILURE path taken in completeExecution');
+                console.log('❌ data.success is:', data.success, typeof data.success);
+                console.log('❌ data.error is:', data.error);
+
+                addExecutionLogEntry('❌ R code execution failed after debugging', '#e74c3c');
+                addExecutionLogEntry(`🔄 Attempted ${iterations} iteration(s)`, '#f39c12');
+
+                // Enhanced failure feedback
+                displayFailedExecutionFeedback(data, iterations);
+            }
+        }
+
+        function displayComprehensiveExecutionSummary(data) {
+            // Create comprehensive execution summary similar to reference project
+            const summaryHtml = `
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 15px 0;">
+                    <h5 style="color: #495057; margin-bottom: 15px; display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">📊</span>
+                        <strong>Execution Summary</strong>
+                    </h5>
+
+                    ${generateExecutionDetailsSection(data)}
+                    ${generateWarningsSection(data)}
+                    ${generateActionsSection(data)}
+                    ${generateCodeEvolutionSection(data)}
+                    <!-- REMOVED: generateFilesSection() call - function deleted -->
+                </div>
+            `;
+
+            // Add to AI chat area
+            addAIMessage(summaryHtml);
+        }
+
+        function generateExecutionDetailsSection(data) {
+            const iterations = data.iterations_used || 1;
+            const executionTime = data.execution_time || 0;
+            const status = data.success ? '✅ Success' : '❌ Failed';
+            const statusColor = data.success ? '#28a745' : '#dc3545';
+
+            return `
+                <div style="margin-bottom: 15px;">
+                    <h6 style="color: #6c757d; margin-bottom: 8px;">🔍 Execution Details</h6>
+                    <div style="background: white; border-radius: 4px; padding: 12px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                            <div><strong>Status:</strong> <span style="color: ${statusColor};">${status}</span></div>
+                            <div><strong>Iterations:</strong> ${iterations}/3</div>
+                            <div><strong>Execution Time:</strong> ${executionTime.toFixed(2)}s</div>
+                            <div><strong>Files Generated:</strong> ${data.files_generated ? data.files_generated.length : 0}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateWarningsSection(data) {
+            if (!data.warnings || data.warnings.length === 0) {
+                return '';
+            }
+
+            const warningsHtml = data.warnings.map(warning => `
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 8px; margin-bottom: 8px;">
+                    <span style="color: #856404;">⚠️ ${warning}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div style="margin-bottom: 15px;">
+                    <h6 style="color: #6c757d; margin-bottom: 8px;">⚠️ Warnings & Quality Issues</h6>
+                    <div style="background: white; border-radius: 4px; padding: 12px;">
+                        ${warningsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateActionsSection(data) {
+            // Extract actions from iteration details if available
+            const actions = [];
+
+            if (data.iterations_used > 1) {
+                actions.push(`🔧 LLM debugging activated after iteration 1 failure`);
+                if (data.success) {
+                    actions.push(`✅ Code successfully fixed in iteration ${data.iterations_used}`);
+                }
+                if (data.warnings && data.warnings.some(w => w.includes('quality'))) {
+                    actions.push(`🎯 Quality improvement attempted`);
+                }
+            }
+
+            if (data.error && data.error.includes('bind_rows')) {
+                actions.push(`❌ Quality improvement failed: Missing dplyr functions`);
+            }
+
+            if (actions.length === 0) {
+                return '';
+            }
+
+            const actionsHtml = actions.map(action => `
+                <div style="padding: 4px 0; color: #495057;">• ${action}</div>
+            `).join('');
+
+            return `
+                <div style="margin-bottom: 15px;">
+                    <h6 style="color: #6c757d; margin-bottom: 8px;">🎯 Actions Taken</h6>
+                    <div style="background: white; border-radius: 4px; padding: 12px;">
+                        ${actionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCodeEvolutionSection(data) {
+            // Show code evolution if available
+            if (!data.original_code && !data.final_code) {
+                return '';
+            }
+
+            return `
+                <div style="margin-bottom: 15px;">
+                    <h6 style="color: #6c757d; margin-bottom: 8px;">🔄 Code Evolution</h6>
+                    <div style="background: white; border-radius: 4px; padding: 12px;">
+                        <button onclick="toggleCodeEvolution()" style="background: #007bff; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer;">
+                            View Code Changes
+                        </button>
+                        <div id="code-evolution-details" style="display: none; margin-top: 10px;">
+                            <div style="font-family: 'Courier New', monospace; font-size: 12px; background: #f8f9fa; padding: 10px; border-radius: 4px;">
+                                Code evolution details will be loaded here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // REMOVED: generateFilesSection() - only used in summary generation, not main UI functionality
+
+        function displaySuccessfulExecutionFeedback(data, iterations, filesCount) {
+            // Enhanced success feedback
+            addAIMessage(`✅ **Execution Successful!** Completed in ${iterations} iteration(s) with ${filesCount} files generated.`);
+
+            if (data.warnings && data.warnings.length > 0) {
+                data.warnings.forEach(warning => {
+                    addAIMessage(`⚠️ **Quality Note**: ${warning}`);
+                });
+
+                // Add specific guidance for HTML file issues
+                if (data.warnings.some(w => w.includes('HTML') || w.includes('output quality'))) {
+                    addAIMessage(`💡 **Guidance**: The R code executed successfully but output format differs from expected:`);
+                    addAIMessage(`• Generated CSV/text files instead of HTML tables`);
+                    addAIMessage(`• This is valid output - check the files below for your results`);
+                    addAIMessage(`• Consider adding HTML table libraries (kableExtra, DT) for formatted tables`);
+                }
+            }
+        }
+
+        function displayFailedExecutionFeedback(data, iterations) {
+            addAIMessage(`❌ **Execution Failed** after ${iterations} iterations.`);
+
+            if (data.error) {
+                addAIMessage(`🔍 **Error Details**: ${data.error}`);
+
+                // Provide specific guidance based on error type
+                if (data.error.includes('object') && data.error.includes('not found')) {
+                    addAIMessage(`💡 **Suggestion**: Variable or column not found. Check your dataset structure and variable names.`);
+                } else if (data.error.includes('could not find function')) {
+                    addAIMessage(`💡 **Suggestion**: Missing R package or function. Ensure all required libraries are loaded.`);
+                } else if (data.error.includes('bind_rows')) {
+                    addAIMessage(`💡 **Suggestion**: dplyr function issue. This often occurs during quality improvement attempts.`);
+                }
+            }
+
+            addAIMessage(`🔧 **Next Steps**: Review the error details and modify your R code accordingly.`);
+        }
+
+        function toggleCodeEvolution() {
+            const details = document.getElementById('code-evolution-details');
+            if (details) {
+                details.style.display = details.style.display === 'none' ? 'block' : 'none';
+
+                if (details.style.display === 'block' && details.innerHTML.includes('will be loaded')) {
+                    // Load actual code evolution details
+                    loadCodeEvolutionDetails();
+                }
+            }
+        }
+
+        function loadCodeEvolutionDetails() {
+            // This would load the actual code changes from the backend
+            const details = document.getElementById('code-evolution-details');
+            if (details) {
+                details.innerHTML = `
+                    <div style="font-family: 'Courier New', monospace; font-size: 12px;">
+                        <div style="color: #28a745; margin-bottom: 10px;">📝 Code evolution tracking will be implemented with backend integration</div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 4px;">
+                            Original Code → LLM Fixes → Final Code
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function handleExecutionFailure(error) {
+            console.log('❌ Handling execution failure');
+
+            updateExecutionProgress(100, 'Failed');
+            updateIterationCounter('Failed', '');
+
+            addExecutionLogEntry('❌ R code execution failed', '#e74c3c');
+            addExecutionLogEntry(`Error: ${error.message}`, '#e74c3c');
+
+            addAIMessage(`❌ **Execution failed** - ${error.message}`);
+            addAIMessage('💡 **Troubleshooting tips**: Check if R is installed, verify data file paths, and ensure required packages are available.');
+        }
+
+        // ========================================
+        // CLEAN EXECUTION SYSTEM - Inspired by Reference Project
+        // ========================================
+
+        function executeRCodeClean(rCode) {
+            console.log('🚀 Starting clean R code execution...');
+
+            // Update UI state - simple and clean
+            updateExecutionUI(true);
+
+            // Add initial message - simple like reference project
+            addAIMessage('🚀 **Starting R Code Execution**');
+
+            // Execute with backend - clean and direct
+            fetch('/execute_rcode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    r_code: rCode,
+                    max_iterations: 3,
+                    session_id: window.sessionId || 'default'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ R execution completed:', data);
+                handleExecutionResultClean(data);
+            })
+            .catch(error => {
+                console.error('❌ R execution error:', error);
+                handleExecutionErrorClean(error);
+            })
+            .finally(() => {
+                updateExecutionUI(false);
+            });
+        }
+
+        function updateExecutionUI(isExecuting) {
+            const executeBtn = document.getElementById('execute-step4-btn');
+            if (executeBtn) {
+                executeBtn.disabled = isExecuting;
+                executeBtn.textContent = isExecuting ? '⏳ Executing...' : '🚀 Execute R Code with AI Debugging';
+            }
+        }
+
+        function handleExecutionResultClean(data) {
+            // Clean result handling inspired by reference project's add_code_execution_result_to_bot_history
+            const success = data.success;
+            const output = data.output || '';
+            const error = data.error || '';
+            const iterations = data.iterations_used || 1;
+            const files = data.files_generated || [];
+
+            if (success) {
+                // Success - show terminal output like reference project
+                addAIMessage(`✔️ **Terminal output:**\n\`\`\`shell\n${output}\n\`\`\``);
+
+                if (iterations > 1) {
+                    addAIMessage(`🔧 **AI Debugging**: Fixed issues automatically in ${iterations} iterations`);
+                }
+
+                if (files.length > 0) {
+                    addAIMessage(`📁 **Files Generated**: ${files.length} files created: ${files.join(', ')}`);
+                }
+
+                // Show warnings if any
+                if (data.warnings && data.warnings.length > 0) {
+                    data.warnings.forEach(warning => {
+                        addAIMessage(`⚠️ **Note**: ${warning}`);
+                    });
+                }
+
+                // Display results
+                displayStep4Results(data);
+            } else {
+                // Error - show terminal output like reference project
+                addAIMessage(`❌ **Terminal output:**\n\`\`\`shell\n\n${error}\n\`\`\``);
+                addAIMessage(`❌ **Execution failed** after ${iterations} iterations`);
+            }
+        }
+
+        function handleExecutionErrorClean(error) {
+            addAIMessage(`❌ **Connection Error**: ${error.message}`);
+            addAIMessage('💡 **Troubleshooting**: Check your connection and try again');
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Clinical TLF Report System - Core Dependencies
+# Production-ready clinical trial report generation system
+
+# Core Python packages
+requests>=2.31.0
+pandas>=2.0.0
+numpy>=1.24.0
+pathlib2>=2.3.7
+
+# LLM API clients
+anthropic>=0.25.0  # Optional: Claude API support
+openai>=1.0.0      # Optional: OpenAI API support
+
+# Local embedding support (optional)
+sentence-transformers>=2.2.0  # Optional: Local embeddings
+torch>=2.0.0                  # Optional: Required for sentence-transformers
+
+# R integration
+subprocess32>=3.5.4  # For R process management
+
+# Web server
+http.server  # Built-in Python module
+socketserver  # Built-in Python module
+
+# Data processing
+json  # Built-in Python module
+os    # Built-in Python module
+sys   # Built-in Python module
+time  # Built-in Python module
+uuid  # Built-in Python module
+logging  # Built-in Python module
+re    # Built-in Python module
+datetime  # Built-in Python module
+typing  # Built-in Python module
+
+# File handling
+pickle  # Built-in Python module
+tempfile  # Built-in Python module
+shutil  # Built-in Python module
+
+# Optional: SAS file reading (for .sas7bdat files)
+pyreadstat>=1.2.0  # Optional: For reading SAS files
+
+# Development dependencies (optional)
+pytest>=7.0.0      # For testing
+black>=23.0.0      # For code formatting
+flake8>=6.0.0      # For linting

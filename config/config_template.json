@@ -1,0 +1,180 @@
+{
+  "API": {
+    "type": "anthropic",
+    "base_url": "https://api.anthropic.com",
+    "API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
+    "API_VERSION": "2023-06-01"
+  },
+  "anthropic_api_key": "YOUR_ANTHROPIC_API_KEY_HERE",
+  "llm_models": {
+    "anthropic": "claude-3-5-sonnet-20241022",
+    "deepseek": "deepseek-chat",
+    "openai": "gpt-4"
+  },
+  "rag_settings": {
+    "embedding_model": "BAAI/bge-base-zh-v1.5",
+    "use_vector_search": true,
+    "fallback_to_keyword": true,
+    "vector_db_path": "data/vector_db",
+    "chunk_size": 512,
+    "chunk_overlap": 128,
+    "top_k": 5
+  },
+  "r_settings": {
+    "use_rpy2": false,
+    "use_subprocess": true,
+    "r_home": "",
+    "dev_mode": true,
+    "default_libraries": [
+      "tidyverse",
+      "haven",
+      "gt",
+      "flextable",
+      "officer",
+      "r2rtf"
+    ],
+    "debug_mode": true,
+    "auto_fix": true,
+    "max_fix_attempts": 3,
+    "timeout": 60
+  },
+  "model": {
+    "default": {
+      "model_name": "claude-3-5-sonnet-20241022",
+      "available": true,
+      "description": "Primary Claude model for text generation and analysis"
+    },
+    "vision": {
+      "model_name": "claude-3-5-sonnet-20241022",
+      "available": true,
+      "description": "Claude model with vision capabilities for figure analysis"
+    },
+    "multimodal": {
+      "model_name": "claude-3-5-sonnet-20241022",
+      "available": true,
+      "description": "Multimodal Claude model for combined text and vision tasks"
+    },
+    "fast": {
+      "model_name": "claude-3-haiku-20240307",
+      "available": true,
+      "description": "Fast Claude model for quick responses"
+    },
+    "experimental": {
+      "model_name": "claude-3-opus-20240229",
+      "available": true,
+      "description": "Most capable Claude model for complex tasks"
+    }
+  },
+  "model_context_window": {
+    "claude-3-5-sonnet-20241022": 200000,
+    "claude-3-haiku-20240307": 200000,
+    "claude-3-opus-20240229": 200000
+  },
+  "model_capabilities": {
+    "claude-3-5-sonnet-20241022": {
+      "text_generation": true,
+      "vision_analysis": true,
+      "multimodal": true,
+      "code_generation": true,
+      "reasoning": true
+    },
+    "claude-3-haiku-20240307": {
+      "text_generation": true,
+      "vision_analysis": true,
+      "multimodal": true,
+      "code_generation": true,
+      "reasoning": true
+    },
+    "claude-3-opus-20240229": {
+      "text_generation": true,
+      "vision_analysis": true,
+      "multimodal": true,
+      "code_generation": true,
+      "reasoning": true
+    }
+  },
+  "multi_model_config": {
+    "template_generation": {
+      "primary_model": "claude-3-5-sonnet-20241022",
+      "fallback_model": "claude-3-haiku-20240307",
+      "experimental_model": "claude-3-opus-20240229"
+    },
+    "figure_generation": {
+      "vision_model": "claude-3-5-sonnet-20241022",
+      "multimodal_model": "claude-3-5-sonnet-20241022",
+      "fast_model": "claude-3-haiku-20240307"
+    },
+    "evaluation": {
+      "primary_evaluator": "claude-3-5-sonnet-20241022",
+      "consensus_evaluator": "claude-3-opus-20240229"
+    }
+  },
+  "paths": {
+    "templates_dir": "./templates",
+    "datasets_dir": "./data/adam",
+    "output_dir": "./output",
+    "cache_dir": "./data/cache",
+    "experiment_results": "./experiment_results"
+  },
+  "rag": {
+    "embedding_model": "BAAI/bge-base-zh-v1.5",
+    "use_vector_search": true,
+    "fallback_to_keyword": true,
+    "vector_db_path": "data/vector_db",
+    "chunk_size": 512,
+    "chunk_overlap": 128,
+    "top_k": 5
+  },
+  "r_interpreter": {
+    "use_rpy2": false,
+    "use_subprocess": true,
+    "r_home": "",
+    "dev_mode": true,
+    "default_libraries": [
+      "tidyverse",
+      "haven",
+      "gt",
+      "flextable",
+      "officer",
+      "r2rtf"
+    ],
+    "debug_mode": true,
+    "auto_fix": true,
+    "max_fix_attempts": 3,
+    "timeout": 60
+  },
+  "ui": {
+    "theme": "default",
+    "port": 7860,
+    "share": false,
+    "debug": false,
+    "default_interface": "workflow"
+  },
+  "assistant": {
+    "model": "claude-3-5-sonnet-20241022",
+    "temperature": 0.7,
+    "max_history_length": 10,
+    "auto_save_interval": 60
+  },
+  "session": {
+    "auto_save": true,
+    "auto_save_interval": 60,
+    "max_sessions": 20
+  },
+  "experimental_framework": {
+    "max_queries": 20,
+    "max_datasets": 3,
+    "evaluation_criteria": [
+      "clinical_relevance",
+      "statistical_accuracy",
+      "regulatory_compliance",
+      "visual_quality"
+    ],
+    "figure_evaluation_criteria": [
+      "clinical_relevance",
+      "statistical_accuracy",
+      "regulatory_compliance",
+      "visual_quality"
+    ]
+  }
+} 
