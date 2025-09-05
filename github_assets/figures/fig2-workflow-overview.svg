@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2250" height="1200" viewBox="0 0 2250 1200">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', 'Arial', sans-serif; font-size: 24px; font-weight: 600; fill: #343a40; }
+      .step-title { font-family: 'Inter', 'Arial', sans-serif; font-size: 18px; font-weight: 700; fill: #343a40; }
+      .step-desc { font-family: 'Inter', 'Arial', sans-serif; font-size: 14px; fill: #6c757d; }
+      .step-details { font-family: 'Inter', 'Arial', sans-serif; font-size: 11px; fill: #6c757d; }
+      .step-number { font-family: 'Inter', 'Arial', sans-serif; font-size: 24px; font-weight: 700; fill: white; }
+      .step1-box { fill: #e3f2fd; stroke: #17a2b8; stroke-width: 3; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1)); }
+      .step2-box { fill: #e8f5e9; stroke: #28a745; stroke-width: 3; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1)); }
+      .step3-box { fill: #fff3e0; stroke: #ff9800; stroke-width: 3; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1)); }
+      .step4-box { fill: #f3e5f5; stroke: #667eea; stroke-width: 3; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1)); }
+      .arrow { stroke: #007bff; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .subprocess-box { fill: #f8f9fa; stroke: #dee2e6; stroke-width: 2; }
+      .subprocess-title { font-family: 'Inter', 'Arial', sans-serif; font-size: 12px; font-weight: 600; fill: #495057; }
+      .subprocess-item { font-family: 'Inter', 'Arial', sans-serif; font-size: 10px; fill: #6c757d; }
+    </style>
+    <marker id="arrowhead" markerWidth="15" markerHeight="12" refX="14" refY="6" orient="auto">
+      <polygon points="0 0, 15 6, 0 12" fill="#007bff"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="1125" y="40" text-anchor="middle" class="title">Clinical TLF Generation: 4-Step Automated Workflow</text>
+  
+  <!-- Step 1: Query Analysis -->
+  <rect x="50" y="100" width="480" height="200" rx="20" class="step1-box"/>
+  <circle cx="120" cy="130" r="25" fill="#17a2b8"/>
+  <text x="120" y="140" text-anchor="middle" class="step-number">1</text>
+  <text x="120" y="180" text-anchor="middle" style="font-size: 32px;">🔍</text>
+  <text x="290" y="140" text-anchor="middle" class="step-title">Query Analysis</text>
+  <text x="290" y="165" text-anchor="middle" class="step-desc">Natural language processing and domain detection</text>
+  <text x="290" y="190" text-anchor="middle" class="step-details">• NLP Processing • Domain Classification</text>
+  <text x="290" y="205" text-anchor="middle" class="step-details">• Complexity Assessment • Dataset Mapping</text>
+  <text x="290" y="220" text-anchor="middle" class="step-details">• RAG Template Retrieval</text>
+  
+  <!-- Arrow 1 - Clean horizontal -->
+  <path d="M 550 200 L 630 200" class="arrow"/>
+
+  <!-- Step 2: Template Generation -->
+  <rect x="650" y="100" width="480" height="200" rx="20" class="step2-box"/>
+  <circle cx="720" cy="130" r="25" fill="#28a745"/>
+  <text x="720" y="140" text-anchor="middle" class="step-number">2</text>
+  <text x="720" y="180" text-anchor="middle" style="font-size: 32px;">📋</text>
+  <text x="890" y="140" text-anchor="middle" class="step-title">Template Generation</text>
+  <text x="890" y="165" text-anchor="middle" class="step-desc">AI-powered mock template creation with FDA compliance</text>
+  <text x="890" y="190" text-anchor="middle" class="step-details">• Mock Template Generation • FDA Compliance Check</text>
+  <text x="890" y="205" text-anchor="middle" class="step-details">• Professional Formatting • User Editing Interface</text>
+  <text x="890" y="220" text-anchor="middle" class="step-details">• Template Validation</text>
+
+  <!-- Arrow 2 - Clean horizontal -->
+  <path d="M 1150 200 L 1230 200" class="arrow"/>
+
+  <!-- Step 3: R Code Generation -->
+  <rect x="1250" y="100" width="480" height="200" rx="20" class="step3-box"/>
+  <circle cx="1320" cy="130" r="25" fill="#ff9800"/>
+  <text x="1320" y="140" text-anchor="middle" class="step-number">3</text>
+  <text x="1320" y="180" text-anchor="middle" style="font-size: 32px;">💻</text>
+  <text x="1490" y="140" text-anchor="middle" class="step-title">R Code Generation</text>
+  <text x="1490" y="165" text-anchor="middle" class="step-desc">Context-aware R code with dataset-specific mapping</text>
+  <text x="1490" y="190" text-anchor="middle" class="step-details">• Context Analysis • Variable Mapping</text>
+  <text x="1490" y="205" text-anchor="middle" class="step-details">• R Code Generation • Session-Aware Paths</text>
+  <text x="1490" y="220" text-anchor="middle" class="step-details">• Error Handling</text>
+
+  <!-- Arrow 3 - Improved curved path -->
+  <path d="M 1490 320 Q 1490 360 1125 360 Q 760 360 760 420" class="arrow"/>
+  
+  <!-- Step 4: Interactive Execution -->
+  <rect x="520" y="460" width="480" height="200" rx="20" class="step4-box"/>
+  <circle cx="590" cy="490" r="25" fill="#667eea"/>
+  <text x="590" y="500" text-anchor="middle" class="step-number">4</text>
+  <text x="590" y="540" text-anchor="middle" style="font-size: 32px;">⚡</text>
+  <text x="760" y="500" text-anchor="middle" class="step-title">Interactive Execution</text>
+  <text x="760" y="525" text-anchor="middle" class="step-desc">ChatGPT-style execution with real-time debugging</text>
+  <text x="760" y="550" text-anchor="middle" class="step-details">• R Code Execution • Real-time Monitoring</text>
+  <text x="760" y="565" text-anchor="middle" class="step-details">• Interactive Debugging • Session Persistence</text>
+  <text x="760" y="580" text-anchor="middle" class="step-details">• Export Options</text>
+  
+  <!-- Subprocess Details -->
+  <text x="1125" y="720" text-anchor="middle" class="step-title">Detailed Sub-processes</text>
+  
+  <!-- Step 1 Details -->
+  <rect x="50" y="750" width="480" height="120" rx="12" class="subprocess-box"/>
+  <text x="70" y="770" class="subprocess-title">Step 1: Analysis Details</text>
+  <text x="70" y="790" class="subprocess-item">• Query embedding generation</text>
+  <text x="70" y="805" class="subprocess-item">• Domain scoring (Demographics, AE, Efficacy)</text>
+  <text x="70" y="820" class="subprocess-item">• Complexity level assessment</text>
+  <text x="70" y="835" class="subprocess-item">• ADaM dataset identification</text>
+  <text x="70" y="850" class="subprocess-item">• Similar template retrieval (Top-5)</text>
+  
+  <!-- Step 2 Details -->
+  <rect x="570" y="750" width="480" height="120" rx="12" class="subprocess-box"/>
+  <text x="590" y="770" class="subprocess-title">Step 2: Template Details</text>
+  <text x="590" y="790" class="subprocess-item">• RAG-based template analysis</text>
+  <text x="590" y="805" class="subprocess-item">• AI-powered layout generation</text>
+  <text x="590" y="820" class="subprocess-item">• FDA regulatory compliance check</text>
+  <text x="590" y="835" class="subprocess-item">• Professional styling application</text>
+  <text x="590" y="850" class="subprocess-item">• User customization interface</text>
+  
+  <!-- Step 3 Details -->
+  <rect x="1090" y="750" width="480" height="120" rx="12" class="subprocess-box"/>
+  <text x="1110" y="770" class="subprocess-title">Step 3: Code Details</text>
+  <text x="1110" y="790" class="subprocess-item">• Template context analysis</text>
+  <text x="1110" y="805" class="subprocess-item">• Dataset variable mapping</text>
+  <text x="1110" y="820" class="subprocess-item">• Modern R package utilization</text>
+  <text x="1110" y="835" class="subprocess-item">• Session-aware file management</text>
+  <text x="1110" y="850" class="subprocess-item">• Comprehensive error handling</text>
+  
+  <!-- Step 4 Details -->
+  <rect x="1610" y="750" width="480" height="120" rx="12" class="subprocess-box"/>
+  <text x="1630" y="770" class="subprocess-title">Step 4: Execution Details</text>
+  <text x="1630" y="790" class="subprocess-item">• Enhanced R interpreter</text>
+  <text x="1630" y="805" class="subprocess-item">• Real-time status monitoring</text>
+  <text x="1630" y="820" class="subprocess-item">• Automatic error detection</text>
+  <text x="1630" y="835" class="subprocess-item">• AI-powered debugging assistance</text>
+  <text x="1630" y="850" class="subprocess-item">• Multi-format export options</text>
+  
+  <!-- Feedback Loop -->
+  <rect x="50" y="920" width="2150" height="80" rx="12" fill="#f8f9fa" stroke="#ffc107" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="1125" y="945" text-anchor="middle" class="subprocess-title" fill="#ff9800">Iterative Feedback and Quality Assurance</text>
+  <text x="300" y="965" text-anchor="middle" class="subprocess-item">User Feedback: Review and modification at each step</text>
+  <text x="750" y="965" text-anchor="middle" class="subprocess-item">Error Recovery: AI-assisted debugging and correction</text>
+  <text x="1200" y="965" text-anchor="middle" class="subprocess-item">Quality Control: FDA compliance validation</text>
+  <text x="1650" y="965" text-anchor="middle" class="subprocess-item">Learning System: Pattern storage for improvement</text>
+  
+  <!-- Feedback arrows - Cleaner positioning -->
+  <path d="M 290 320 Q 290 380 290 900" stroke="#ffc107" stroke-width="2" fill="none" stroke-dasharray="5,5" opacity="0.7"/>
+  <path d="M 890 320 Q 890 380 890 900" stroke="#ffc107" stroke-width="2" fill="none" stroke-dasharray="5,5" opacity="0.7"/>
+  <path d="M 1490 320 Q 1490 380 1490 900" stroke="#ffc107" stroke-width="2" fill="none" stroke-dasharray="5,5" opacity="0.7"/>
+  <path d="M 760 680 Q 760 720 760 900" stroke="#ffc107" stroke-width="2" fill="none" stroke-dasharray="5,5" opacity="0.7"/>
+  
+</svg>

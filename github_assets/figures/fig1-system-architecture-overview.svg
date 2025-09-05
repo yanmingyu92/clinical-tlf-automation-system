@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2250" height="1200" viewBox="0 0 2250 1200">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', 'Arial', sans-serif; font-size: 24px; font-weight: 600; fill: #343a40; }
+      .layer-title { font-family: 'Inter', 'Arial', sans-serif; font-size: 18px; font-weight: 600; }
+      .component-title { font-family: 'Inter', 'Arial', sans-serif; font-size: 14px; font-weight: 500; fill: #343a40; }
+      .component-subtitle { font-family: 'Inter', 'Arial', sans-serif; font-size: 11px; fill: #6c757d; }
+      .layer-ui { fill: #e3f2fd; stroke: #17a2b8; stroke-width: 3; }
+      .layer-agents { fill: #e8f5e9; stroke: #28a745; stroke-width: 3; }
+      .layer-services { fill: #fff3e0; stroke: #ff9800; stroke-width: 3; }
+      .layer-data { fill: #f3e5f5; stroke: #667eea; stroke-width: 3; }
+      .layer-external { fill: #fafafa; stroke: #6c757d; stroke-width: 3; }
+      .component-box { fill: white; stroke: #dee2e6; stroke-width: 2; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+      .connection-line { stroke: #007bff; stroke-width: 3; fill: none; opacity: 0.7; }
+      .layer-label-bg { fill: white; stroke: inherit; stroke-width: 2; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto">
+      <polygon points="0 0, 12 4.5, 0 9" fill="#007bff" opacity="0.7"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="1125" y="40" text-anchor="middle" class="title">Clinical TLF Automation System Architecture</text>
+  
+  <!-- User Interface Layer -->
+  <rect x="50" y="80" width="2150" height="140" rx="15" class="layer-ui"/>
+  <rect x="80" y="65" width="200" height="30" rx="8" class="layer-label-bg layer-ui"/>
+  <text x="180" y="85" text-anchor="middle" class="layer-title" fill="#17a2b8">User Interface Layer</text>
+  
+  <!-- UI Components -->
+  <rect x="200" y="120" width="300" height="80" rx="12" class="component-box"/>
+  <text x="350" y="145" text-anchor="middle" class="component-title">🖥️ Web Interface</text>
+  <text x="350" y="165" text-anchor="middle" class="component-subtitle">HTML/CSS/JavaScript</text>
+  <text x="350" y="180" text-anchor="middle" class="component-subtitle">Real-time Updates</text>
+  
+  <rect x="1750" y="120" width="300" height="80" rx="12" class="component-box"/>
+  <text x="1900" y="145" text-anchor="middle" class="component-title">🚪 API Gateway</text>
+  <text x="1900" y="165" text-anchor="middle" class="component-subtitle">REST Endpoints</text>
+  <text x="1900" y="180" text-anchor="middle" class="component-subtitle">Request Routing</text>
+  
+  <!-- AI Agent Layer -->
+  <rect x="50" y="260" width="2150" height="160" rx="15" class="layer-agents"/>
+  <rect x="80" y="245" width="150" height="30" rx="8" class="layer-label-bg layer-agents"/>
+  <text x="155" y="265" text-anchor="middle" class="layer-title" fill="#28a745">AI Agent Layer</text>
+  
+  <!-- Agent Components -->
+  <rect x="150" y="300" width="250" height="100" rx="12" class="component-box"/>
+  <text x="275" y="325" text-anchor="middle" class="component-title">🔍 Query Analysis Agent</text>
+  <text x="275" y="345" text-anchor="middle" class="component-subtitle">Domain Detection</text>
+  <text x="275" y="360" text-anchor="middle" class="component-subtitle">Complexity Assessment</text>
+  <text x="275" y="375" text-anchor="middle" class="component-subtitle">Dataset Mapping</text>
+  
+  <rect x="450" y="300" width="250" height="100" rx="12" class="component-box"/>
+  <text x="575" y="325" text-anchor="middle" class="component-title">📋 Template Generation Agent</text>
+  <text x="575" y="345" text-anchor="middle" class="component-subtitle">Mock Template Creation</text>
+  <text x="575" y="360" text-anchor="middle" class="component-subtitle">FDA Compliance</text>
+  <text x="575" y="375" text-anchor="middle" class="component-subtitle">Professional Formatting</text>
+  
+  <rect x="750" y="300" width="250" height="100" rx="12" class="component-box"/>
+  <text x="875" y="325" text-anchor="middle" class="component-title">💻 Code Generation Agent</text>
+  <text x="875" y="345" text-anchor="middle" class="component-subtitle">R Code Generation</text>
+  <text x="875" y="360" text-anchor="middle" class="component-subtitle">Variable Mapping</text>
+  <text x="875" y="375" text-anchor="middle" class="component-subtitle">Session-Aware Paths</text>
+  
+  <rect x="1050" y="300" width="250" height="100" rx="12" class="component-box"/>
+  <text x="1175" y="325" text-anchor="middle" class="component-title">⚡ Execution Agent</text>
+  <text x="1175" y="345" text-anchor="middle" class="component-subtitle">Interactive Debugging</text>
+  <text x="1175" y="360" text-anchor="middle" class="component-subtitle">Session Management</text>
+  <text x="1175" y="375" text-anchor="middle" class="component-subtitle">Real-time Monitoring</text>
+  
+  <!-- Core Services Layer -->
+  <rect x="50" y="460" width="2150" height="160" rx="15" class="layer-services"/>
+  <rect x="80" y="445" width="140" height="30" rx="8" class="layer-label-bg layer-services"/>
+  <text x="150" y="465" text-anchor="middle" class="layer-title" fill="#ff9800">Core Services</text>
+  
+  <!-- Service Components -->
+  <rect x="200" y="500" width="250" height="100" rx="12" class="component-box"/>
+  <text x="325" y="525" text-anchor="middle" class="component-title">🧠 Unified LLM Client</text>
+  <text x="325" y="545" text-anchor="middle" class="component-subtitle">DeepSeek/Claude/OpenAI</text>
+  <text x="325" y="560" text-anchor="middle" class="component-subtitle">Multi-Provider Support</text>
+  
+  <rect x="500" y="500" width="250" height="100" rx="12" class="component-box"/>
+  <text x="625" y="525" text-anchor="middle" class="component-title">📚 RAG System</text>
+  <text x="625" y="545" text-anchor="middle" class="component-subtitle">Vector Database</text>
+  <text x="625" y="560" text-anchor="middle" class="component-subtitle">Template Retrieval</text>
+  
+  <rect x="800" y="500" width="250" height="100" rx="12" class="component-box"/>
+  <text x="925" y="525" text-anchor="middle" class="component-title">📊 R Integration</text>
+  <text x="925" y="545" text-anchor="middle" class="component-subtitle">Enhanced Interpreter</text>
+  <text x="925" y="560" text-anchor="middle" class="component-subtitle">Session Persistence</text>
+  
+  <rect x="1100" y="500" width="250" height="100" rx="12" class="component-box"/>
+  <text x="1225" y="525" text-anchor="middle" class="component-title">🔄 Session Manager</text>
+  <text x="1225" y="545" text-anchor="middle" class="component-subtitle">State Management</text>
+  <text x="1225" y="560" text-anchor="middle" class="component-subtitle">Result Storage</text>
+  
+  <!-- Data Layer -->
+  <rect x="50" y="660" width="2150" height="140" rx="15" class="layer-data"/>
+  <rect x="80" y="645" width="100" height="30" rx="8" class="layer-label-bg layer-data"/>
+  <text x="130" y="665" text-anchor="middle" class="layer-title" fill="#667eea">Data Layer</text>
+  
+  <!-- Data Components -->
+  <rect x="200" y="700" width="250" height="80" rx="12" class="component-box"/>
+  <text x="325" y="725" text-anchor="middle" class="component-title">🗄️ Vector Database</text>
+  <text x="325" y="745" text-anchor="middle" class="component-subtitle">Template Embeddings</text>
+  <text x="325" y="760" text-anchor="middle" class="component-subtitle">Semantic Search</text>
+  
+  <rect x="500" y="700" width="250" height="80" rx="12" class="component-box"/>
+  <text x="625" y="725" text-anchor="middle" class="component-title">📁 Template Library</text>
+  <text x="625" y="745" text-anchor="middle" class="component-subtitle">FDA Standards</text>
+  <text x="625" y="760" text-anchor="middle" class="component-subtitle">Clinical Templates</text>
+  
+  <rect x="800" y="700" width="250" height="80" rx="12" class="component-box"/>
+  <text x="925" y="725" text-anchor="middle" class="component-title">📈 Clinical Datasets</text>
+  <text x="925" y="745" text-anchor="middle" class="component-subtitle">ADaM Format</text>
+  <text x="925" y="760" text-anchor="middle" class="component-subtitle">CDISC Standards</text>
+  
+  <rect x="1100" y="700" width="250" height="80" rx="12" class="component-box"/>
+  <text x="1225" y="725" text-anchor="middle" class="component-title">💾 Result Storage</text>
+  <text x="1225" y="745" text-anchor="middle" class="component-subtitle">Generated Files</text>
+  <text x="1225" y="760" text-anchor="middle" class="component-subtitle">Session Data</text>
+  
+  <!-- External Services Layer -->
+  <rect x="50" y="840" width="2150" height="140" rx="15" class="layer-external"/>
+  <rect x="80" y="825" width="160" height="30" rx="8" class="layer-label-bg layer-external"/>
+  <text x="160" y="845" text-anchor="middle" class="layer-title" fill="#6c757d">External Services</text>
+  
+  <!-- External Components -->
+  <rect x="400" y="880" width="250" height="80" rx="12" class="component-box"/>
+  <text x="525" y="905" text-anchor="middle" class="component-title">🤖 DeepSeek API</text>
+  <text x="525" y="925" text-anchor="middle" class="component-subtitle">Primary LLM Provider</text>
+  <text x="525" y="940" text-anchor="middle" class="component-subtitle">Code Generation</text>
+  
+  <rect x="700" y="880" width="250" height="80" rx="12" class="component-box"/>
+  <text x="825" y="905" text-anchor="middle" class="component-title">🧠 Claude API</text>
+  <text x="825" y="925" text-anchor="middle" class="component-subtitle">Anthropic LLM</text>
+  <text x="825" y="940" text-anchor="middle" class="component-subtitle">Analysis Tasks</text>
+  
+  <rect x="1000" y="880" width="250" height="80" rx="12" class="component-box"/>
+  <text x="1125" y="905" text-anchor="middle" class="component-title">📊 R Environment</text>
+  <text x="1125" y="925" text-anchor="middle" class="component-subtitle">Statistical Computing</text>
+  <text x="1125" y="940" text-anchor="middle" class="component-subtitle">Package Ecosystem</text>
+  
+  <!-- Connection Lines - Organized Flow -->
+
+  <!-- UI Layer to Agent Layer (Clean vertical flow) -->
+  <path d="M 350 220 Q 350 240 275 260" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 1900 220 Q 1900 240 1175 260" class="connection-line" marker-end="url(#arrowhead)"/>
+
+  <!-- Agent Workflow (Horizontal progression) -->
+  <path d="M 400 350 L 430 350" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 700 350 L 730 350" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 1000 350 L 1030 350" class="connection-line" marker-end="url(#arrowhead)"/>
+
+  <!-- Agents to Services (Direct vertical connections) -->
+  <path d="M 275 420 L 325 460" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 575 420 L 625 460" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 875 420 L 925 460" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 1175 420 L 1225 460" class="connection-line" marker-end="url(#arrowhead)"/>
+
+  <!-- Services to Data (Clean vertical flow) -->
+  <path d="M 325 620 L 325 680" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 625 620 L 625 680" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 925 620 L 925 680" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 1225 620 L 1225 680" class="connection-line" marker-end="url(#arrowhead)"/>
+
+  <!-- Services to External (Organized connections) -->
+  <path d="M 325 620 Q 325 740 525 840" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 325 620 Q 325 740 825 840" class="connection-line" marker-end="url(#arrowhead)"/>
+  <path d="M 925 620 Q 925 740 1125 840" class="connection-line" marker-end="url(#arrowhead)"/>
+
+  <!-- Data to External (Database connections) -->
+  <path d="M 325 800 Q 325 820 525 860" class="connection-line" marker-end="url(#arrowhead)" stroke-dasharray="3,3" opacity="0.5"/>
+  <path d="M 625 800 Q 625 820 825 860" class="connection-line" marker-end="url(#arrowhead)" stroke-dasharray="3,3" opacity="0.5"/>
+  
+</svg>

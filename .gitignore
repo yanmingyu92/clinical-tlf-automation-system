@@ -15,11 +15,15 @@ config/*_local.json
 
 # Research Materials (not for GitHub - keep local)
 scientific_paper_materials/
-github_assets/
 *_GITHUB.md
 GITHUB_READY_SUMMARY.md
 github_cleanup.py
 simple_github_cleanup.py
+
+# Allow github_assets/figures for README display
+!github_assets/
+!github_assets/figures/
+!github_assets/figures/*.svg
 
 # Development and Testing
 archive/

@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="800" viewBox="0 0 1050 800">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', 'Arial', sans-serif; font-size: 20px; font-weight: 600; fill: #343a40; }
+      .step-title { font-family: 'Inter', 'Arial', sans-serif; font-size: 24px; font-weight: 700; fill: #343a40; }
+      .step-desc { font-family: 'Inter', 'Arial', sans-serif; font-size: 16px; fill: #6c757d; }
+      .step-details { font-family: 'Inter', 'Arial', sans-serif; font-size: 14px; fill: #6c757d; }
+      .step-number { font-family: 'Inter', 'Arial', sans-serif; font-size: 32px; font-weight: 700; fill: white; }
+      .process-title { font-family: 'Inter', 'Arial', sans-serif; font-size: 16px; font-weight: 600; fill: #495057; }
+      .process-item { font-family: 'Inter', 'Arial', sans-serif; font-size: 13px; fill: #6c757d; }
+      .result-label { font-family: 'Inter', 'Arial', sans-serif; font-size: 14px; font-weight: 600; fill: #495057; }
+      .result-value { font-family: 'Inter', 'Arial', sans-serif; font-size: 13px; fill: #343a40; }
+      .step-box { fill: #e3f2fd; stroke: #17a2b8; stroke-width: 4; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1)); }
+      .process-box { fill: white; stroke: #17a2b8; stroke-width: 2; }
+      .result-box { fill: #f8f9fa; stroke: #28a745; stroke-width: 2; }
+    </style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="525" y="40" text-anchor="middle" class="title">Step 1: Query Analysis - Natural Language Processing</text>
+  
+  <!-- Main Step Container -->
+  <rect x="50" y="80" width="950" height="200" rx="20" class="step-box"/>
+  
+  <!-- Step Number -->
+  <circle cx="150" cy="130" r="30" fill="#17a2b8"/>
+  <text x="150" y="140" text-anchor="middle" class="step-number">1</text>
+  
+  <!-- Step Icon -->
+  <text x="150" y="200" text-anchor="middle" style="font-size: 48px;">🔍</text>
+  
+  <!-- Step Content -->
+  <text x="525" y="130" text-anchor="middle" class="step-title">Query Analysis</text>
+  <text x="525" y="160" text-anchor="middle" class="step-desc">Natural language processing and intelligent domain detection</text>
+  <text x="525" y="190" text-anchor="middle" class="step-details">Advanced NLP techniques identify clinical domains and assess query complexity</text>
+  <text x="525" y="210" text-anchor="middle" class="step-details">Automated dataset mapping and template retrieval from knowledge base</text>
+  
+  <!-- Processing Steps -->
+  <text x="525" y="320" text-anchor="middle" class="process-title">Analysis Process</text>
+  
+  <!-- Process Flow -->
+  <rect x="50" y="350" width="180" height="120" rx="12" class="process-box"/>
+  <text x="140" y="375" text-anchor="middle" class="process-title">NLP Processing</text>
+  <text x="60" y="395" class="process-item">• Tokenization</text>
+  <text x="60" y="415" class="process-item">• Named Entity Recognition</text>
+  <text x="60" y="435" class="process-item">• Semantic Analysis</text>
+  <text x="60" y="455" class="process-item">• Intent Classification</text>
+  
+  <rect x="270" y="350" width="180" height="120" rx="12" class="process-box"/>
+  <text x="360" y="375" text-anchor="middle" class="process-title">Domain Detection</text>
+  <text x="280" y="395" class="process-item">• Demographics: 94.2%</text>
+  <text x="280" y="415" class="process-item">• Adverse Events: 93.4%</text>
+  <text x="280" y="435" class="process-item">• Vital Signs: 95.1%</text>
+  <text x="280" y="455" class="process-item">• Laboratory: 92.7%</text>
+  
+  <rect x="490" y="350" width="180" height="120" rx="12" class="process-box"/>
+  <text x="580" y="375" text-anchor="middle" class="process-title">Complexity Assessment</text>
+  <text x="500" y="395" class="process-item">• Simple: Basic tables</text>
+  <text x="500" y="415" class="process-item">• Medium: Statistical tests</text>
+  <text x="500" y="435" class="process-item">• Complex: Multi-domain</text>
+  <text x="500" y="455" class="process-item">• Advanced: Custom logic</text>
+  
+  <rect x="710" y="350" width="180" height="120" rx="12" class="process-box"/>
+  <text x="800" y="375" text-anchor="middle" class="process-title">Dataset Mapping</text>
+  <text x="720" y="395" class="process-item">• ADSL: Subject-level</text>
+  <text x="720" y="415" class="process-item">• ADAE: Adverse events</text>
+  <text x="720" y="435" class="process-item">• ADVS: Vital signs</text>
+  <text x="720" y="455" class="process-item">• ADLB: Laboratory</text>
+  
+  <!-- Analysis Results -->
+  <text x="525" y="520" text-anchor="middle" class="process-title">Example Analysis Results</text>
+  
+  <rect x="50" y="550" width="950" height="180" rx="12" class="result-box"/>
+  
+  <!-- Input Query -->
+  <text x="70" y="580" class="result-label">Input Query:</text>
+  <text x="70" y="600" class="result-value">"Generate a demographics table showing baseline characteristics by treatment group with statistical tests"</text>
+  
+  <!-- Results Grid -->
+  <text x="70" y="640" class="result-label">Analysis Results:</text>
+  
+  <text x="100" y="665" class="result-label">Domain:</text>
+  <text x="200" y="665" class="result-value">Demographics (Confidence: 94.2%)</text>
+  
+  <text x="100" y="685" class="result-label">Complexity:</text>
+  <text x="200" y="685" class="result-value">Medium (Statistical tests required)</text>
+  
+  <text x="100" y="705" class="result-label">Dataset:</text>
+  <text x="200" y="705" class="result-value">ADSL (Subject-Level Analysis Dataset)</text>
+  
+  <text x="500" y="665" class="result-label">Variables Detected:</text>
+  <text x="650" y="665" class="result-value">AGE, SEX, RACE, TRT01A, SAFFL</text>
+  
+  <text x="500" y="685" class="result-label">Statistical Tests:</text>
+  <text x="650" y="685" class="result-value">t-test, Chi-square, Fisher's exact</text>
+  
+  <text x="500" y="705" class="result-label">Similar Templates:</text>
+  <text x="650" y="705" class="result-value">5 found (Demographics_Table_v2.3, etc.)</text>
+  
+  <!-- Performance Indicators -->
+  <circle cx="900" cy="600" r="8" fill="#28a745"/>
+  <text x="920" y="605" class="result-value">Processing Time: 0.8s</text>
+  
+  <circle cx="900" cy="630" r="8" fill="#28a745"/>
+  <text x="920" y="635" class="result-value">Accuracy: 94.2%</text>
+  
+  <circle cx="900" cy="660" r="8" fill="#28a745"/>
+  <text x="920" y="665" class="result-value">Templates Retrieved: 5</text>
+  
+  <circle cx="900" cy="690" r="8" fill="#28a745"/>
+  <text x="920" y="695" class="result-value">FDA Compliance: ✓</text>
+  
+  <!-- Flow Arrows -->
+  <path d="M 230 410 L 250 410" stroke="#17a2b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 450 410 L 470 410" stroke="#17a2b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 670 410 L 690 410" stroke="#17a2b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#17a2b8"/>
+    </marker>
+  </defs>
+  
+</svg>
